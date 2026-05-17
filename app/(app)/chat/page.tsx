@@ -10,7 +10,7 @@ import { getSupabase } from '@/lib/supabase/client';
 import { registerPushNotifications } from '@/lib/push';
 
 export default function ChatPage() {
-  useRealtimeMessages();
+  const { loadMoreMessages, hasMoreMessages, isLoadingMore } = useRealtimeMessages();
   const { couple, user } = useAuthStore();
   const setPartnerTyping = useChatStore((s) => s.setPartnerTyping);
   const typingChannelRef = useRef<ReturnType<ReturnType<typeof getSupabase>['channel']> | null>(null);
@@ -44,7 +44,11 @@ export default function ChatPage() {
 
   return (
     <div className="flex flex-col fixed top-16 bottom-[80px] md:bottom-0 left-0 right-0 overflow-hidden bg-background">
-      <ChatWindow />
+      <ChatWindow 
+        loadMoreMessages={loadMoreMessages} 
+        hasMoreMessages={hasMoreMessages} 
+        isLoadingMore={isLoadingMore} 
+      />
       <MessageInput />
     </div>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef, useState } from 'react';
 import { getSupabase } from '@/lib/supabase/client';
 import { decryptMessage } from '@/lib/crypto/e2ee';
 import { getMyKeys } from '@/lib/crypto/keyManager';
@@ -35,19 +35,24 @@ export function useRealtimeMessages() {
       .is('seen_at', null);
   }, [couple?.id, user?.id]);
 
+  const [hasMoreMessages, setHasMoreMessages] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const MESSAGE_LIMIT = 50;
+
   const fetchMessages = useCallback(async () => {
     if (!couple?.id) return;
     const supabase = getSupabase();
-    // Fetch the LATEST 200 messages (order desc to get newest, then reverse for display)
+    // Fetch the LATEST batch of messages (order desc to get newest, then reverse for display)
     const { data } = await supabase
       .from('messages')
       .select('*')
       .eq('couple_id', couple.id)
       .is('deleted_at', null)
       .order('created_at', { ascending: false })
-      .limit(200);
+      .limit(MESSAGE_LIMIT);
 
     if (data) {
+      if (data.length < MESSAGE_LIMIT) setHasMoreMessages(false);
       // Reverse so messages display oldest-first (chronological order)
       const chronological = data.reverse();
       setMessages(chronological.map(decryptMsg));
@@ -57,6 +62,36 @@ export function useRealtimeMessages() {
       }
     }
   }, [couple?.id, decryptMsg, setMessages, markAsSeen]);
+
+  const loadMoreMessages = useCallback(async () => {
+    if (!couple?.id || isLoadingMore || !hasMoreMessages) return;
+    
+    const messages = useChatStore.getState().messages;
+    if (messages.length === 0) return;
+    
+    setIsLoadingMore(true);
+    const oldestMessage = messages[0];
+    const supabase = getSupabase();
+    
+    const { data } = await supabase
+      .from('messages')
+      .select('*')
+      .eq('couple_id', couple.id)
+      .is('deleted_at', null)
+      .lt('created_at', oldestMessage.created_at)
+      .order('created_at', { ascending: false })
+      .limit(MESSAGE_LIMIT);
+
+    if (data) {
+      if (data.length < MESSAGE_LIMIT) setHasMoreMessages(false);
+      
+      const chronological = data.reverse();
+      const newMessages = chronological.map(decryptMsg);
+      useChatStore.getState().prependMessages(newMessages);
+    }
+    
+    setIsLoadingMore(false);
+  }, [couple?.id, decryptMsg, isLoadingMore, hasMoreMessages]);
 
   // Handle focus and tab visibility change to auto-mark messages as seen
   useEffect(() => {
@@ -132,5 +167,5 @@ export function useRealtimeMessages() {
     };
   }, [couple?.id, fetchMessages, addMessage, decryptMsg, user?.id, markAsSeen]);
 
-  return { fetchMessages };
+  return { fetchMessages, loadMoreMessages, hasMoreMessages, isLoadingMore };
 }
