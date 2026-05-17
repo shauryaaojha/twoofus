@@ -12,7 +12,16 @@ import type SimplePeer from 'simple-peer';
 let activeManager: CallManager | null = null;
 let activeTimer: NodeJS.Timeout | null = null;
 let activeTimeout: NodeJS.Timeout | null = null;
-const instanceId = crypto.randomUUID();
+
+// Safe UUID generation fallback for Node/SSR environments lacking global crypto in secure/server scopes
+const generateUUID = () => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return Math.random().toString(36).substring(2) + Date.now().toString(36);
+};
+
+const instanceId = generateUUID();
 const processedSignalIds = new Set<string>();
 
 export function useCall() {
