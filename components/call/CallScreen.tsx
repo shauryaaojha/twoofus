@@ -27,67 +27,102 @@ export default function CallScreen({
   isMuted, isVideoOff,
 }: CallScreenProps) {
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteAudioRef = useRef<HTMLAudioElement>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
 
   const [remoteVideoActive, setRemoteVideoActive] = useState(false);
   const [localVideoActive, setLocalVideoActive] = useState(false);
 
+  // Attach remote stream — use both a video element AND a separate audio element
+  // This ensures audio always plays even if video is hidden
   useEffect(() => {
-    if (remoteVideoRef.current && remoteStream) {
-      remoteVideoRef.current.srcObject = remoteStream;
-      
-      const updateTrackStatus = () => {
-        const hasVideo = remoteStream.getVideoTracks().length > 0 && remoteStream.getVideoTracks().some(t => t.enabled && !t.muted);
-        setRemoteVideoActive(hasVideo);
-      };
-      
-      updateTrackStatus();
-      
-      remoteStream.addEventListener('addtrack', updateTrackStatus);
-      remoteStream.addEventListener('removetrack', updateTrackStatus);
-      
-      const tracks = remoteStream.getVideoTracks();
-      tracks.forEach(track => {
-        track.addEventListener('mute', updateTrackStatus);
-        track.addEventListener('unmute', updateTrackStatus);
-        track.addEventListener('ended', updateTrackStatus);
-      });
-      
-      return () => {
-        remoteStream.removeEventListener('addtrack', updateTrackStatus);
-        remoteStream.removeEventListener('removetrack', updateTrackStatus);
-        tracks.forEach(track => {
-          track.removeEventListener('mute', updateTrackStatus);
-          track.removeEventListener('unmute', updateTrackStatus);
-          track.removeEventListener('ended', updateTrackStatus);
-        });
-      };
-    } else {
+    if (!remoteStream) {
       setRemoteVideoActive(false);
+      return;
     }
+
+    console.log('[CallScreen] Attaching remote stream. Tracks:', {
+      audio: remoteStream.getAudioTracks().map(t => ({ id: t.id, enabled: t.enabled, muted: t.muted, readyState: t.readyState })),
+      video: remoteStream.getVideoTracks().map(t => ({ id: t.id, enabled: t.enabled, muted: t.muted, readyState: t.readyState })),
+    });
+
+    // Attach to video element for video display
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = remoteStream;
+      // Force play (browsers may block autoplay)
+      remoteVideoRef.current.play().catch(err => {
+        console.warn('[CallScreen] Remote video autoplay blocked:', err);
+      });
+    }
+
+    // Attach to a separate audio element to guarantee audio playback
+    if (remoteAudioRef.current) {
+      remoteAudioRef.current.srcObject = remoteStream;
+      remoteAudioRef.current.play().catch(err => {
+        console.warn('[CallScreen] Remote audio autoplay blocked:', err);
+      });
+    }
+
+    const updateTrackStatus = () => {
+      const videoTracks = remoteStream.getVideoTracks();
+      const hasVideo = videoTracks.length > 0 && videoTracks.some(t => t.enabled && !t.muted && t.readyState === 'live');
+      setRemoteVideoActive(hasVideo);
+    };
+
+    updateTrackStatus();
+
+    remoteStream.addEventListener('addtrack', updateTrackStatus);
+    remoteStream.addEventListener('removetrack', updateTrackStatus);
+
+    const tracks = remoteStream.getVideoTracks();
+    tracks.forEach(track => {
+      track.addEventListener('mute', updateTrackStatus);
+      track.addEventListener('unmute', updateTrackStatus);
+      track.addEventListener('ended', updateTrackStatus);
+    });
+
+    // Also listen for audio track state changes
+    const audioTracks = remoteStream.getAudioTracks();
+    audioTracks.forEach(track => {
+      track.addEventListener('ended', () => {
+        console.warn('[CallScreen] Remote audio track ended');
+      });
+    });
+
+    return () => {
+      remoteStream.removeEventListener('addtrack', updateTrackStatus);
+      remoteStream.removeEventListener('removetrack', updateTrackStatus);
+      tracks.forEach(track => {
+        track.removeEventListener('mute', updateTrackStatus);
+        track.removeEventListener('unmute', updateTrackStatus);
+        track.removeEventListener('ended', updateTrackStatus);
+      });
+    };
   }, [remoteStream]);
 
+  // Attach local stream
   useEffect(() => {
     if (localVideoRef.current && localStream) {
       localVideoRef.current.srcObject = localStream;
-      
+      localVideoRef.current.play().catch(() => {});
+
       const updateTrackStatus = () => {
         const hasVideo = localStream.getVideoTracks().length > 0 && localStream.getVideoTracks().some(t => t.enabled && !t.muted);
         setLocalVideoActive(hasVideo);
       };
-      
+
       updateTrackStatus();
-      
+
       localStream.addEventListener('addtrack', updateTrackStatus);
       localStream.addEventListener('removetrack', updateTrackStatus);
-      
+
       const tracks = localStream.getVideoTracks();
       tracks.forEach(track => {
         track.addEventListener('mute', updateTrackStatus);
         track.addEventListener('unmute', updateTrackStatus);
         track.addEventListener('ended', updateTrackStatus);
       });
-      
+
       return () => {
         localStream.removeEventListener('addtrack', updateTrackStatus);
         localStream.removeEventListener('removetrack', updateTrackStatus);
@@ -104,6 +139,9 @@ export default function CallScreen({
 
   return (
     <div className="fixed inset-0 z-50 bg-background flex items-center justify-center">
+      {/* Hidden audio element — guarantees remote audio playback */}
+      <audio ref={remoteAudioRef} autoPlay playsInline style={{ display: 'none' }} />
+
       {/* Remote video/audio stream container */}
       <div className="absolute inset-0 z-0">
         {remoteStream && (

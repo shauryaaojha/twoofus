@@ -20,7 +20,7 @@ export function useRealtimeMessages() {
     if (!keys || !partner?.public_key) return { ...msg, plaintext: '[encrypted]' };
     const partnerPub = decodeBase64(partner.public_key);
     const plaintext = decryptMessage(msg.ciphertext, msg.nonce, partnerPub, keys.secretKey);
-    return { ...msg, plaintext: plaintext || '[decryption failed]' };
+    return { ...msg, plaintext: plaintext || (msg.type === 'call' ? '{"callType":"voice","status":"ended"}' : '[decryption failed]') };
   }, [partner]);
 
   // Mark unseen partner messages as seen

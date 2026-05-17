@@ -144,6 +144,9 @@ export default function MessageBubble({ message, isMine }: { message: Message; i
   const repliedMessage = message.reply_to ? messages.find((m) => m.id === message.reply_to) : null;
   const isDeleted = !!message.deleted_at;
 
+  // Call events are rendered by CallEventBubble, not MessageBubble
+  if (message.type === 'call') return null;
+
   const handleReact = async (emoji: string) => {
     try {
       const supabase = getSupabase();

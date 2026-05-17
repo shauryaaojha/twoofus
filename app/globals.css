@@ -247,3 +247,97 @@ body {
   animation: pulse-quick 0.5s ease-in-out 2;
   z-index: 10;
 }
+
+/* ===== Call Event Bubbles (Instagram-style) ===== */
+.call-event-bubble {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0;
+  width: 100%;
+}
+
+.call-event-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--color-surface-container);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 9999px;
+  padding: 10px 20px;
+  max-width: 360px;
+  width: fit-content;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.call-event-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.call-event-icon--normal {
+  background: var(--color-tertiary-container);
+  color: var(--color-on-tertiary-container);
+}
+
+.call-event-icon--missed {
+  background: var(--color-error-container);
+  color: var(--color-on-error-container);
+}
+
+.call-event-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.call-event-status {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.call-event-time {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 14px;
+  color: var(--color-outline);
+  white-space: nowrap;
+}
+
+.call-event-callback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-tertiary-container);
+  color: var(--color-on-tertiary-container);
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+.call-event-callback:hover {
+  filter: brightness(1.2);
+  transform: scale(1.1);
+}
+
+/* ===== Fade-in animation ===== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+

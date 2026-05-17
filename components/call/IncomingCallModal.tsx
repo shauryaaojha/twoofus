@@ -3,11 +3,12 @@
 interface IncomingCallModalProps {
   callerName: string;
   callerAvatar?: string | null;
+  isVideo?: boolean;
   onAccept: () => void;
   onDecline: () => void;
 }
 
-export default function IncomingCallModal({ callerName, callerAvatar, onAccept, onDecline }: IncomingCallModalProps) {
+export default function IncomingCallModal({ callerName, callerAvatar, isVideo, onAccept, onDecline }: IncomingCallModalProps) {
   return (
     <div className="fixed inset-0 z-[80] bg-background/90 backdrop-blur-xl flex flex-col items-center justify-center">
       {/* Avatar with pulse rings */}
@@ -31,7 +32,9 @@ export default function IncomingCallModal({ callerName, callerAvatar, onAccept, 
         <h1 className="text-3xl md:text-5xl font-semibold text-on-surface tracking-tight" style={{ fontFamily: 'var(--font-headline)' }}>
           {callerName} is calling...
         </h1>
-        <p className="text-lg text-on-surface-variant/80">Voice Call</p>
+        <p className="text-lg text-on-surface-variant/80">
+          {isVideo ? 'Video Call' : 'Voice Call'}
+        </p>
       </div>
 
       {/* Action buttons */}

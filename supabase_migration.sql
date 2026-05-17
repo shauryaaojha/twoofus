@@ -79,7 +79,7 @@ create table if not exists public.messages (
   sender_id uuid not null references public.profiles(id),
   ciphertext text not null,
   nonce text not null,
-  type text not null default 'text' check (type in ('text', 'photo', 'reaction')),
+  type text not null default 'text' check (type in ('text', 'photo', 'reaction', 'call')),
   reply_to uuid references public.messages(id),
   reaction text,
   seen_at timestamptz,

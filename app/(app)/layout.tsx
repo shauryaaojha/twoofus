@@ -103,6 +103,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <IncomingCallModal
           callerName={partner.display_name || 'Partner'}
           callerAvatar={partner.avatar_url}
+          isVideo={!!(
+            incomingCall.payload &&
+            typeof incomingCall.payload === 'object' &&
+            'sdp' in incomingCall.payload &&
+            typeof (incomingCall.payload as any).sdp === 'string' &&
+            (incomingCall.payload as any).sdp.includes('m=video')
+          )}
           onAccept={() => {
             const isVideoCall = !!(
               incomingCall.payload &&

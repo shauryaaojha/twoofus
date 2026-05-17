@@ -30,7 +30,7 @@ export interface Message {
   sender_id: string;
   ciphertext: string;
   nonce: string;
-  type: 'text' | 'photo' | 'reaction';
+  type: 'text' | 'photo' | 'reaction' | 'call';
   reply_to: string | null;
   reaction: string | null;
   seen_at: string | null;

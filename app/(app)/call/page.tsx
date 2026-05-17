@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useCall } from '@/hooks/useCall';
 import { useAuthStore } from '@/lib/store/authStore';
 import CallScreenComponent from '@/components/call/CallScreen';
@@ -10,6 +11,7 @@ export default function CallPage() {
   const { isInCall, localStream, remoteStream, callDuration, callError, startCall, endCall } = useCall();
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
+  const router = useRouter();
 
   const toggleMute = () => {
     if (localStream) {
@@ -25,6 +27,23 @@ export default function CallPage() {
     }
   };
 
+  const handleEndCall = async () => {
+    await endCall();
+    router.push('/chat');
+  };
+
+  // If call ends externally (partner hangs up), redirect back to chat
+  useEffect(() => {
+    if (!isInCall && callDuration === 0 && !callError) return; // Initial state, skip
+    if (!isInCall) {
+      // Call ended — wait a moment so user sees the state, then redirect
+      const timer = setTimeout(() => {
+        router.push('/chat');
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [isInCall, callDuration, callError, router]);
+
   if (isInCall) {
     return (
       <CallScreenComponent
@@ -35,7 +54,7 @@ export default function CallPage() {
         onToggleMute={toggleMute}
         onToggleVideo={toggleVideo}
         onFlipCamera={() => {}}
-        onEndCall={endCall}
+        onEndCall={handleEndCall}
         isMuted={isMuted}
         isVideoOff={isVideoOff}
       />

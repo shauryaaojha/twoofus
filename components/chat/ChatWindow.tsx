@@ -4,6 +4,7 @@ import { useRef, useEffect } from 'react';
 import { useChatStore } from '@/lib/store/chatStore';
 import { useAuthStore } from '@/lib/store/authStore';
 import MessageBubble from './MessageBubble';
+import CallEventBubble from './CallEventBubble';
 import TypingIndicator from './TypingIndicator';
 
 export default function ChatWindow() {
@@ -28,9 +29,13 @@ export default function ChatWindow() {
             <p className="text-outline text-sm mt-2">Messages are end-to-end encrypted</p>
           </div>
         )}
-        {messages.map((msg) => (
-          <MessageBubble key={msg.id} message={msg} isMine={msg.sender_id === user?.id} />
-        ))}
+        {messages.map((msg) => {
+          // Render call events as centered event bubbles (Instagram-style)
+          if (msg.type === 'call') {
+            return <CallEventBubble key={msg.id} message={msg} isMine={msg.sender_id === user?.id} />;
+          }
+          return <MessageBubble key={msg.id} message={msg} isMine={msg.sender_id === user?.id} />;
+        })}
         {partnerTyping && <TypingIndicator />}
         <div ref={endRef} />
       </div>
