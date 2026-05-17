@@ -12,6 +12,8 @@ import type SimplePeer from 'simple-peer';
 let activeManager: CallManager | null = null;
 let activeTimer: NodeJS.Timeout | null = null;
 let activeTimeout: NodeJS.Timeout | null = null;
+let activeChannel: any = null;
+let activeChannelCreatorHookId: string | null = null;
 
 // Safe UUID generation fallback for Node/SSR environments lacking global crypto in secure/server scopes
 const generateUUID = () => {
@@ -211,10 +213,20 @@ export function useCall() {
   // Listen for incoming signals
   useEffect(() => {
     if (!couple?.id || !user?.id) return;
+    
+    // If a channel is already active, do not subscribe again
+    if (activeChannel) {
+      console.log(`Realtime call signal channel already active, hook ${hookId.current} skipping duplicate subscription`);
+      return;
+    }
+
     const supabase = getSupabase();
+    const channelId = `call_signals:${couple.id}:${user.id}`;
+    
+    console.log(`Subscribing to realtime call signals for couple ${couple.id} (hook: ${hookId.current})`);
     
     const channel = supabase
-      .channel(`call_signals:${couple.id}:${user.id}:${instanceId}:${hookId.current}`)
+      .channel(channelId)
       .on('postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'call_signals', filter: `couple_id=eq.${couple.id}` },
         (payload) => {
@@ -251,11 +263,22 @@ export function useCall() {
             cleanup();
           }
         }
-      )
-      .subscribe();
+      );
+
+    channel.subscribe((status) => {
+      console.log(`Realtime call subscription status for hook ${hookId.current}:`, status);
+    });
+
+    activeChannel = channel;
+    activeChannelCreatorHookId = hookId.current;
 
     return () => {
-      supabase.removeChannel(channel);
+      if (activeChannelCreatorHookId === hookId.current) {
+        console.log(`Cleaning up realtime call channel from creator hook: ${hookId.current}`);
+        supabase.removeChannel(channel);
+        activeChannel = null;
+        activeChannelCreatorHookId = null;
+      }
     };
   }, [couple?.id, user?.id, setIncomingCall, cleanup]);
 

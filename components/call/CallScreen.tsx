@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60).toString().padStart(2, '0');
@@ -29,21 +29,78 @@ export default function CallScreen({
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
 
+  const [remoteVideoActive, setRemoteVideoActive] = useState(false);
+  const [localVideoActive, setLocalVideoActive] = useState(false);
+
   useEffect(() => {
     if (remoteVideoRef.current && remoteStream) {
       remoteVideoRef.current.srcObject = remoteStream;
+      
+      const updateTrackStatus = () => {
+        const hasVideo = remoteStream.getVideoTracks().length > 0 && remoteStream.getVideoTracks().some(t => t.enabled && !t.muted);
+        setRemoteVideoActive(hasVideo);
+      };
+      
+      updateTrackStatus();
+      
+      remoteStream.addEventListener('addtrack', updateTrackStatus);
+      remoteStream.addEventListener('removetrack', updateTrackStatus);
+      
+      const tracks = remoteStream.getVideoTracks();
+      tracks.forEach(track => {
+        track.addEventListener('mute', updateTrackStatus);
+        track.addEventListener('unmute', updateTrackStatus);
+        track.addEventListener('ended', updateTrackStatus);
+      });
+      
+      return () => {
+        remoteStream.removeEventListener('addtrack', updateTrackStatus);
+        remoteStream.removeEventListener('removetrack', updateTrackStatus);
+        tracks.forEach(track => {
+          track.removeEventListener('mute', updateTrackStatus);
+          track.removeEventListener('unmute', updateTrackStatus);
+          track.removeEventListener('ended', updateTrackStatus);
+        });
+      };
+    } else {
+      setRemoteVideoActive(false);
     }
   }, [remoteStream]);
 
   useEffect(() => {
     if (localVideoRef.current && localStream) {
       localVideoRef.current.srcObject = localStream;
+      
+      const updateTrackStatus = () => {
+        const hasVideo = localStream.getVideoTracks().length > 0 && localStream.getVideoTracks().some(t => t.enabled && !t.muted);
+        setLocalVideoActive(hasVideo);
+      };
+      
+      updateTrackStatus();
+      
+      localStream.addEventListener('addtrack', updateTrackStatus);
+      localStream.addEventListener('removetrack', updateTrackStatus);
+      
+      const tracks = localStream.getVideoTracks();
+      tracks.forEach(track => {
+        track.addEventListener('mute', updateTrackStatus);
+        track.addEventListener('unmute', updateTrackStatus);
+        track.addEventListener('ended', updateTrackStatus);
+      });
+      
+      return () => {
+        localStream.removeEventListener('addtrack', updateTrackStatus);
+        localStream.removeEventListener('removetrack', updateTrackStatus);
+        tracks.forEach(track => {
+          track.removeEventListener('mute', updateTrackStatus);
+          track.removeEventListener('unmute', updateTrackStatus);
+          track.removeEventListener('ended', updateTrackStatus);
+        });
+      };
+    } else {
+      setLocalVideoActive(false);
     }
   }, [localStream]);
-
-  // Determine if streams have active video tracks (not muted / disabled)
-  const hasRemoteVideo = !!(remoteStream && remoteStream.getVideoTracks().length > 0 && remoteStream.getVideoTracks().some(t => t.enabled));
-  const hasLocalVideo = !!(localStream && localStream.getVideoTracks().length > 0 && localStream.getVideoTracks().some(t => t.enabled));
 
   return (
     <div className="fixed inset-0 z-50 bg-background flex items-center justify-center">
@@ -54,11 +111,15 @@ export default function CallScreen({
             ref={remoteVideoRef}
             autoPlay
             playsInline
-            className={`w-full h-full object-cover ${hasRemoteVideo ? 'block' : 'hidden'}`}
+            className={`w-full h-full object-cover ${
+              remoteVideoActive 
+                ? 'block' 
+                : 'absolute opacity-0 pointer-events-none w-[1px] h-[1px]'
+            }`}
           />
         )}
         
-        {(!remoteStream || !hasRemoteVideo) && (
+        {(!remoteStream || !remoteVideoActive) && (
           <div className="w-full h-full bg-surface-container flex flex-col items-center justify-center gap-4">
             <div className="w-32 h-32 rounded-full bg-primary-container/30 border border-primary/20 flex items-center justify-center shadow-[0_0_40px_rgba(255,178,184,0.15)] relative">
               <div className="absolute inset-0 rounded-full border-2 border-primary/10 animate-ping opacity-25" style={{ animationDuration: '3s' }} />
@@ -96,12 +157,16 @@ export default function CallScreen({
                 autoPlay
                 playsInline
                 muted
-                className={`w-full h-full object-cover ${hasLocalVideo ? 'block' : 'hidden'}`}
+                className={`w-full h-full object-cover ${
+                  localVideoActive 
+                    ? 'block' 
+                    : 'absolute opacity-0 pointer-events-none w-[1px] h-[1px]'
+                }`}
                 style={{ transform: 'scaleX(-1)' }}
               />
             )}
             
-            {(!localStream || !hasLocalVideo) && (
+            {(!localStream || !localVideoActive) && (
               <div className="w-full h-full bg-surface-container flex items-center justify-center">
                 <span className="material-symbols-outlined text-[36px] text-on-surface-variant">person</span>
               </div>

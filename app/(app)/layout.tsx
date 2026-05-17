@@ -104,7 +104,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           callerName={partner.display_name || 'Partner'}
           callerAvatar={partner.avatar_url}
           onAccept={() => {
-            answerCall(incomingCall);
+            const isVideoCall = !!(
+              incomingCall.payload &&
+              typeof incomingCall.payload === 'object' &&
+              'sdp' in incomingCall.payload &&
+              typeof (incomingCall.payload as any).sdp === 'string' &&
+              (incomingCall.payload as any).sdp.includes('m=video')
+            );
+            console.log('Answering incoming call. Detected video support:', isVideoCall);
+            answerCall(incomingCall, isVideoCall);
             router.push('/call');
           }}
           onDecline={declineCall}
