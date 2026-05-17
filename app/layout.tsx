@@ -35,23 +35,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: `
               if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function() {
-                  var isLocalhost = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
-                  if (isLocalhost) {
-                    navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                      registrations.forEach(function(registration) {
-                        registration.unregister();
-                      });
-                    });
-                    if ('caches' in window) {
-                      caches.keys().then(function(cacheNames) {
-                        cacheNames.forEach(function(cacheName) {
-                          caches.delete(cacheName);
-                        });
-                      });
-                    }
-                    return;
-                  }
-
                   navigator.serviceWorker.register('/sw.js').then(
                     function(registration) {
                       console.log('ServiceWorker registration successful with scope: ', registration.scope);

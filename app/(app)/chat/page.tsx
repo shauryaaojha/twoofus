@@ -7,12 +7,17 @@ import { useRealtimeMessages } from '@/hooks/useRealtimeMessages';
 import { useAuthStore } from '@/lib/store/authStore';
 import { useChatStore } from '@/lib/store/chatStore';
 import { getSupabase } from '@/lib/supabase/client';
+import { registerPushNotifications } from '@/lib/push';
 
 export default function ChatPage() {
   useRealtimeMessages();
   const { couple, user } = useAuthStore();
   const setPartnerTyping = useChatStore((s) => s.setPartnerTyping);
   const typingChannelRef = useRef<ReturnType<ReturnType<typeof getSupabase>['channel']> | null>(null);
+
+  useEffect(() => {
+    registerPushNotifications();
+  }, []);
 
   // Subscribe to typing broadcast channel
   useEffect(() => {

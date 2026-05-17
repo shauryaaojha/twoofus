@@ -13,7 +13,7 @@ import { useChatStore } from '@/lib/store/chatStore';
 export default function MessageInput() {
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
-  const { couple, partner, user } = useAuthStore();
+  const { couple, partner, user, profile } = useAuthStore();
   const { replyToMessage, setReplyToMessage } = useChatStore();
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -57,7 +57,7 @@ export default function MessageInput() {
     const { ciphertext, nonce } = encryptMessage(text.trim(), partnerPub, keys.secretKey);
 
     const supabase = getSupabase();
-    await supabase.from('messages').insert({
+    const { error: insertError } = await supabase.from('messages').insert({
       couple_id: couple.id,
       sender_id: user?.id,
       ciphertext,
@@ -65,6 +65,14 @@ export default function MessageInput() {
       type: 'text',
       reply_to: replyToMessage?.id || null,
     });
+
+    if (!insertError && partner?.id) {
+      sendPushNotification(
+        partner.id,
+        profile?.display_name || 'Partner',
+        text.trim()
+      );
+    }
 
     setText('');
     setReplyToMessage(null);
@@ -158,6 +166,14 @@ export default function MessageInput() {
 
       if (messageDbError) throw messageDbError;
 
+      if (partner?.id) {
+        sendPushNotification(
+          partner.id,
+          profile?.display_name || 'Partner',
+          '📷 Sent a photo'
+        );
+      }
+
       setReplyToMessage(null);
       showToast(`Photo shared! (${remaining - 1} remaining today)`, 'success');
     } catch (err: any) {
@@ -226,4 +242,22 @@ export default function MessageInput() {
       </div>
     </div>
   );
+}
+
+async function sendPushNotification(recipientId: string, title: string, body: string) {
+  try {
+    await fetch('/api/push/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId: recipientId,
+        title,
+        body,
+      }),
+    });
+  } catch (err) {
+    console.error('Failed to send push notification:', err);
+  }
 }

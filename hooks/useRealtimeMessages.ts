@@ -11,7 +11,7 @@ import type { Message } from '@/types';
 
 export function useRealtimeMessages() {
   const { couple, partner, user } = useAuthStore();
-  const { addMessage, setMessages } = useChatStore();
+  const { addMessage, setMessages, messages } = useChatStore();
   const channelRef = useRef<ReturnType<ReturnType<typeof getSupabase>['channel']> | null>(null);
 
   const decryptMsg = useCallback((msg: Message): Message => {
@@ -48,10 +48,50 @@ export function useRealtimeMessages() {
 
     if (data) {
       setMessages(data.map(decryptMsg));
-      // Mark partner messages as seen
-      markAsSeen();
+      // Mark partner messages as seen only if tab is currently visible
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        markAsSeen();
+      }
     }
   }, [couple?.id, decryptMsg, setMessages, markAsSeen]);
+
+  // Handle focus and tab visibility change to auto-mark messages as seen
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleFocus = () => {
+      if (document.visibilityState === 'visible') {
+        markAsSeen();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
+
+    // Initial check on mount
+    handleFocus();
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
+    };
+  }, [markAsSeen]);
+
+  // Update document title tab with unread count
+  useEffect(() => {
+    if (typeof window === 'undefined' || !user?.id) return;
+
+    const unreadCount = messages.filter(
+      (m) => m.sender_id !== user.id && !m.seen_at && !m.deleted_at
+    ).length;
+
+    const baseTitle = "TwoOfUs — A Private Universe for Two";
+    if (unreadCount > 0) {
+      document.title = `(${unreadCount}) ${baseTitle}`;
+    } else {
+      document.title = baseTitle;
+    }
+  }, [messages, user?.id]);
 
   useEffect(() => {
     if (!couple?.id) return;
@@ -65,8 +105,8 @@ export function useRealtimeMessages() {
         (payload) => {
           const msg = payload.new as Message;
           addMessage(decryptMsg(msg));
-          // Auto-mark seen if from partner
-          if (msg.sender_id !== user?.id) {
+          // Auto-mark seen if from partner and tab is visible
+          if (msg.sender_id !== user?.id && typeof document !== 'undefined' && document.visibilityState === 'visible') {
             markAsSeen();
           }
         }
