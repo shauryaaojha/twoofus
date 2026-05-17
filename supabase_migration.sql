@@ -62,6 +62,12 @@ create policy "Users can insert couples" on public.couples
 create policy "Users can update own couples" on public.couples
   for update using (auth.uid() = user_a or auth.uid() = user_b);
 
+-- Allow anyone to accept an active, unclaimed invite by setting user_b to themselves
+create policy "Anyone can accept an invite" on public.couples
+  for update
+  using (invite_token is not null and user_b is null and status = 'active')
+  with check (auth.uid() = user_b);
+
 -- Allow reading couple by invite token (for accepting invites)
 create policy "Anyone can read by invite token" on public.couples
   for select using (invite_token is not null);

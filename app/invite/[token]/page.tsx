@@ -81,15 +81,17 @@ export default function AcceptInvitePage() {
       }
 
       // Accept: set user_b and paired_at, clear invite token
-      const { error: updateError } = await supabase
+      const { data, error: updateError } = await supabase
         .from('couples').update({
           user_b: user.id,
           paired_at: new Date().toISOString(),
           invite_token: null,
           invite_expires_at: null,
-        }).eq('id', couple.id);
+        })
+        .eq('id', couple.id)
+        .select();
 
-      if (updateError) {
+      if (updateError || !data || data.length === 0) {
         setError('Failed to pair. Please try again.');
         setStatus('error');
         return;
