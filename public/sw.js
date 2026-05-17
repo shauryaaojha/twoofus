@@ -1,8 +1,5 @@
-const CACHE_NAME = 'twoofus-v1';
+const CACHE_NAME = 'twoofus-v2';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/login',
-  '/signup',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
@@ -41,6 +38,21 @@ self.addEventListener('fetch', (event) => {
 
   // Skip chrome-extension scheme or other non-http/https protocols
   if (!event.request.url.startsWith(self.location.origin)) return;
+
+  const requestUrl = new URL(event.request.url);
+  const shouldBypassCache =
+    event.request.mode === 'navigate' ||
+    requestUrl.pathname.startsWith('/_next/') ||
+    requestUrl.pathname.startsWith('/api/') ||
+    requestUrl.pathname.startsWith('/auth/') ||
+    requestUrl.pathname === '/login' ||
+    requestUrl.pathname === '/signup' ||
+    requestUrl.pathname === '/unlock';
+
+  if (shouldBypassCache) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {

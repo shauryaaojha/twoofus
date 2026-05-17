@@ -11,18 +11,29 @@ export default function OAuthButtons() {
     setLoading(true);
     setError('');
     const supabase = getSupabase();
+    const appOrigin = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
     
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${appOrigin}/auth/callback?next=/unlock`,
+        skipBrowserRedirect: true,
       },
     });
 
     if (error) {
       setError(error.message);
       setLoading(false);
+      return;
     }
+
+    if (!data?.url) {
+      setError('Could not start Google sign in. Please try again.');
+      setLoading(false);
+      return;
+    }
+
+    window.location.assign(data.url);
   };
 
   return (
