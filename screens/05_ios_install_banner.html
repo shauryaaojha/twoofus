@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TwoOfUs - Install</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&amp;family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ffb4ab",
+                        "on-tertiary-container": "#003117",
+                        "inverse-primary": "#ba1340",
+                        "secondary-fixed-dim": "#ffb2bd",
+                        "surface-container-lowest": "#180a0c",
+                        "on-secondary": "#5f1127",
+                        "error-container": "#93000a",
+                        "primary": "#ffb2b8",
+                        "surface-container-high": "#362627",
+                        "surface-bright": "#473536",
+                        "on-primary": "#67001e",
+                        "surface": "#1e0f11",
+                        "on-secondary-fixed-variant": "#7d283c",
+                        "on-secondary-container": "#ff97a9",
+                        "on-surface-variant": "#e2bec0",
+                        "on-tertiary-fixed": "#00210e",
+                        "surface-variant": "#423031",
+                        "primary-fixed": "#ffdadb",
+                        "tertiary-container": "#04a65c",
+                        "on-surface": "#f8dcdd",
+                        "on-primary-container": "#5b0019",
+                        "on-tertiary-fixed-variant": "#00522a",
+                        "on-primary-fixed": "#40000f",
+                        "on-error": "#690005",
+                        "surface-container-low": "#271819",
+                        "tertiary-fixed-dim": "#5bde8d",
+                        "inverse-on-surface": "#3d2c2d",
+                        "secondary-fixed": "#ffd9dd",
+                        "on-primary-fixed-variant": "#91002d",
+                        "surface-container-highest": "#423031",
+                        "on-error-container": "#ffdad6",
+                        "outline-variant": "#5a4042",
+                        "primary-container": "#ff506f",
+                        "surface-container": "#2b1b1d",
+                        "secondary-container": "#7d283c",
+                        "outline": "#a9898b",
+                        "tertiary": "#5bde8d",
+                        "primary-fixed-dim": "#ffb2b8",
+                        "tertiary-fixed": "#7afca7",
+                        "secondary": "#ffb2bd",
+                        "surface-dim": "#1e0f11",
+                        "surface-tint": "#ffb2b8",
+                        "on-tertiary": "#00391b",
+                        "inverse-surface": "#f8dcdd",
+                        "background": "#1e0f11",
+                        "on-background": "#f8dcdd",
+                        "on-secondary-fixed": "#400014"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "120px",
+                        "container-max": "1100px",
+                        "margin-mobile": "20px",
+                        "unit": "8px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["DM Sans"],
+                        "headline-sm": ["Bodoni Moda"],
+                        "display-lg": ["Bodoni Moda"],
+                        "mono-timestamp": ["JetBrains Mono"],
+                        "body-lg": ["DM Sans"],
+                        "body-md": ["DM Sans"],
+                        "label-caps": ["DM Sans"],
+                        "headline-md": ["Bodoni Moda"],
+                        "display-lg-mobile": ["Bodoni Moda"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-sm": ["24px", { "lineHeight": "32px", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "mono-timestamp": ["11px", { "lineHeight": "14px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["36px", { "lineHeight": "42px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(22, 22, 22, 0.8);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+        }
+        
+        .glow-button {
+            background: linear-gradient(135deg, #ffb2b8 0%, #ffb2bd 100%);
+            box-shadow: 0 0 15px rgba(255, 178, 189, 0.4);
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(4px); }
+        }
+        
+        .animate-float {
+            animation: float 2s ease-in-out infinite;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background antialiased min-h-screen flex flex-col items-center justify-start overflow-hidden relative">
+<!-- Background Image placeholder for app context -->
+<div class="absolute inset-0 z-0">
+<img alt="App Background" class="w-full h-full object-cover opacity-20" data-alt="A moody, cinematic background image for a luxury mobile application. The scene is deeply dark, almost obsidian, with soft, romantic lighting effects reminiscent of glassmorphism. Subtle glowing shapes and a minimalist aesthetic create an intimate, personal atmosphere suitable for a private journal or couples app. The palette is dominated by deep blacks and soft, luminous primary accent colors like soft rose or dark crimson, maintaining a sophisticated, high-end editorial feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDe5QyiXAEG6vyxJ_FECyRTgB_B5U7lHLnHEAf1sbYAOApn1iff-uUkYVLY3OGAbZVdpxB3ozQf0GrEbBUpdKXv8oN0mxd4ahnmUkz4FPM__jLrNPanveLb39Fzkh1N9G-dKEHt4s4u3-NrTJhKN-VtBauEGxd3adTavqMdAFCP6PUXap5paRBhUriqGif2mRz9eQr7V7R1skRGth86LNB03MCpiIO-AdXLXhkHm79j9vh4KCf672BEgrDr8HvABlatesTuvXVmIw"/>
+</div>
+<!-- Main Canvas -->
+<main class="w-full h-full relative z-10 flex flex-col justify-end pb-[120px]">
+<!-- Content here if needed to push banner up, but standard iOS banner is usually top, though prompt says "arrow pointing down to Safari share icon" which implies bottom of screen for iOS Safari, but also says "Fixed top banner (not modal)". Wait, Safari share icon is at the bottom. If it's a fixed top banner with an arrow pointing down, the arrow might just indicate "look down". Let's put it at the top as requested "Fixed top banner", and maybe the arrow points down from the banner. -->
+</main>
+<!-- iOS Install Banner (Fixed Top) -->
+<div class="fixed top-0 left-0 w-full z-50 px-margin-mobile pt-safe-top mt-4 flex flex-col items-center pointer-events-none">
+<!-- Glass Pill Container -->
+<div class="glass-panel w-full max-w-container-max rounded-full p-2 flex items-center justify-between shadow-[0_4px_30px_rgba(0,0,0,0.5)] pointer-events-auto">
+<div class="flex items-center gap-3 w-full">
+<!-- Dismiss X -->
+<button aria-label="Dismiss" class="p-2 text-on-surface-variant hover:text-on-surface transition-colors rounded-full flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]" data-icon="close">close</span>
+</button>
+<!-- App Icon -->
+<div class="w-[48px] h-[48px] rounded-xl flex-shrink-0 overflow-hidden shadow-inner border border-white/10 relative">
+<img alt="TwoOfUs App Icon" class="w-full h-full object-cover" data-alt="A high-end, minimalist app icon design for a private couples app. The icon features a sleek, dark obsidian background with a subtle, glowing primary accent color motif, perhaps two interlocking abstract shapes or a delicate, luminous line art design. The aesthetic is cinematic, luxurious, and deeply intimate, matching the overall dark mode, glassmorphic brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjXVYZb_4UrAcJyV8oJwi_oTi5uSAIXOs_q2tidW4-Y0w45M6IKJYLUqNkcm9Jh91rjet74XSjv44us90yOHmEInUpYfE8awl9P1WbqHX38vcrQ8nti1vAIWZYTAITZ09C5Zm5bolTSGduvao1uy172FhWtzh95Uz2_6GdztpUpvBBXZ7DL1wbY500u6qn6h_Se3xSWo3JD9L0hRXYdsbGNz2bRAXyAIOuT2V5ZC_VCUhGkGYKdeKEqWYDPqrbc6IPxy8PXmNnrQ"/>
+<div class="absolute inset-0 bg-gradient-to-tr from-black/20 to-white/10 mix-blend-overlay"></div>
+</div>
+<!-- Text Content -->
+<div class="flex flex-col flex-grow min-w-0 justify-center h-full">
+<h2 class="font-body-md text-body-md text-on-surface truncate tracking-tight">Install TwoOfUs</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate opacity-80">Add to your home screen</p>
+</div>
+<!-- Install Button -->
+<button class="glow-button px-4 py-2 rounded-full font-label-caps text-label-caps text-on-primary mr-1 flex-shrink-0 transition-transform active:scale-95">
+                    Install
+                </button>
+</div>
+</div>
+<!-- Instructional Arrow (Pointing Down) -->
+<div class="mt-6 flex flex-col items-center gap-2 animate-float pointer-events-none">
+<p class="font-body-sm text-body-sm text-primary-fixed drop-shadow-[0_0_8px_rgba(255,178,184,0.4)]">Tap Share below</p>
+<span class="material-symbols-outlined text-primary-fixed text-[32px] drop-shadow-[0_0_8px_rgba(255,178,184,0.6)]" data-icon="arrow_downward">arrow_downward</span>
+</div>
+</div>
+</body></html>

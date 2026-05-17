@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Photo Preview - TwoOfUs</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&amp;family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "error": "#ffb4ab",
+                  "on-tertiary-container": "#003117",
+                  "inverse-primary": "#ba1340",
+                  "secondary-fixed-dim": "#ffb2bd",
+                  "surface-container-lowest": "#180a0c",
+                  "on-secondary": "#5f1127",
+                  "error-container": "#93000a",
+                  "primary": "#ffb2b8",
+                  "surface-container-high": "#362627",
+                  "surface-bright": "#473536",
+                  "on-primary": "#67001e",
+                  "surface": "#1e0f11",
+                  "on-secondary-fixed-variant": "#7d283c",
+                  "on-secondary-container": "#ff97a9",
+                  "on-surface-variant": "#e2bec0",
+                  "on-tertiary-fixed": "#00210e",
+                  "surface-variant": "#423031",
+                  "primary-fixed": "#ffdadb",
+                  "tertiary-container": "#04a65c",
+                  "on-surface": "#f8dcdd",
+                  "on-primary-container": "#5b0019",
+                  "on-tertiary-fixed-variant": "#00522a",
+                  "on-primary-fixed": "#40000f",
+                  "on-error": "#690005",
+                  "surface-container-low": "#271819",
+                  "tertiary-fixed-dim": "#5bde8d",
+                  "inverse-on-surface": "#3d2c2d",
+                  "secondary-fixed": "#ffd9dd",
+                  "on-primary-fixed-variant": "#91002d",
+                  "surface-container-highest": "#423031",
+                  "on-error-container": "#ffdad6",
+                  "outline-variant": "#5a4042",
+                  "primary-container": "#ff506f",
+                  "surface-container": "#2b1b1d",
+                  "secondary-container": "#7d283c",
+                  "outline": "#a9898b",
+                  "tertiary": "#5bde8d",
+                  "primary-fixed-dim": "#ffb2b8",
+                  "tertiary-fixed": "#7afca7",
+                  "secondary": "#ffb2bd",
+                  "surface-dim": "#1e0f11",
+                  "surface-tint": "#ffb2b8",
+                  "on-tertiary": "#00391b",
+                  "inverse-surface": "#f8dcdd",
+                  "background": "#1e0f11",
+                  "on-background": "#f8dcdd",
+                  "on-secondary-fixed": "#400014"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.25rem",
+                  "lg": "0.5rem",
+                  "xl": "0.75rem",
+                  "full": "9999px"
+          },
+          "spacing": {
+                  "margin-desktop": "120px",
+                  "container-max": "1100px",
+                  "margin-mobile": "20px",
+                  "unit": "8px",
+                  "gutter": "24px"
+          },
+          "fontFamily": {
+                  "body-sm": ["DM Sans"],
+                  "headline-sm": ["Bodoni Moda"],
+                  "display-lg": ["Bodoni Moda"],
+                  "mono-timestamp": ["JetBrains Mono"],
+                  "body-lg": ["DM Sans"],
+                  "body-md": ["DM Sans"],
+                  "label-caps": ["DM Sans"],
+                  "headline-md": ["Bodoni Moda"],
+                  "display-lg-mobile": ["Bodoni Moda"]
+          },
+          "fontSize": {
+                  "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                  "headline-sm": ["24px", { "lineHeight": "32px", "fontWeight": "500" }],
+                  "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                  "mono-timestamp": ["11px", { "lineHeight": "14px", "fontWeight": "400" }],
+                  "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                  "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                  "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                  "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                  "display-lg-mobile": ["36px", { "lineHeight": "42px", "fontWeight": "700" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* Specific Glassmorphism borders as requested */
+    .glass-card {
+      background-color: rgba(22, 22, 22, 0.8);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid transparent;
+      background-image: linear-gradient(rgba(22, 22, 22, 0.8), rgba(22, 22, 22, 0.8)), linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%);
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+    }
+    
+    /* Input field glow */
+    .input-glow:focus-within {
+      box-shadow: 0 1px 0 0 var(--tw-colors-primary);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background h-screen w-screen overflow-hidden font-body-md text-body-md selection:bg-primary selection:text-on-primary">
+<!-- Main App Canvas -->
+<main class="relative w-full h-full max-w-[600px] mx-auto flex flex-col justify-end p-2 md:p-gutter">
+<!-- Full Screen Photo Preview Background -->
+<div class="absolute inset-0 md:inset-4 rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.8)] z-0">
+<img alt="Photo Preview" class="w-full h-full object-cover" data-alt="A cinematic, candid photograph of a couple sharing a quiet, intimate moment in a softly lit cafe. The lighting is moody and warm, emphasizing deep shadows and soft highlights consistent with a romantic, editorial dark-mode aesthetic. The color palette leans heavily into rich obsidian blacks and subtle warm tones, perfectly capturing a sense of privacy and connection." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvCRAqmuRpkEfz1HoiHdiNbNCi1W3ShvZAfVeeKBVNpnC1jbFH8CbbAyAEaEnJ15KV9RCwjiQhBmSCEBtZBhsnLyKbTWLtCM-AoUk_IQb3J70MTzalSZMtG_K1cYhmxdQ4zEcZzEiGVwth8RGjauvPAkQeJ9tH7R0kFOefwfIh9xfjT20Ps_0dEW6YhUGJ9A2pyjoXRyCzV4l3sAubAYD8m2KmCVuIGOzSmyykxlRgucZdmm4Sb-vtPwJSXm_U-2OiN8ldmNqNVg"/>
+<!-- Subtle top and bottom gradients for legibility of UI elements -->
+<div class="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80 pointer-events-none"></div>
+</div>
+<!-- Top App Bar (Contextual/Transactional Override) -->
+<header class="absolute top-6 left-6 right-6 md:top-12 md:left-12 md:right-12 flex justify-between items-center z-20">
+<!-- Close Button -->
+<button class="w-12 h-12 rounded-full bg-surface-container/30 backdrop-blur-xl border border-white/10 flex items-center justify-center text-on-surface hover:bg-surface-container/60 transition-all duration-300 shadow-lg">
+<span class="material-symbols-outlined text-[24px]">close</span>
+</button>
+<!-- Edit Button -->
+<button class="px-5 py-3 rounded-full bg-surface-container/30 backdrop-blur-xl border border-white/10 flex items-center gap-2 text-on-surface hover:bg-surface-container/60 transition-all duration-300 shadow-lg font-label-caps text-label-caps">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+<span>EDIT</span>
+</button>
+</header>
+<!-- Bottom Action Glass Panel -->
+<section class="glass-card w-full rounded-[2rem] p-6 md:p-8 z-20 mb-4 md:mb-6 shadow-[0_0_20px_rgba(0,0,0,0.5)] flex flex-col gap-8 relative overflow-hidden">
+<!-- Catchlight Effect inside the card -->
+<div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-white/20 to-transparent"></div>
+<!-- Quota Tracker -->
+<div class="flex flex-col gap-3">
+<div class="flex justify-between items-end">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant tracking-widest uppercase">Daily Quota</h3>
+<span class="font-mono-timestamp text-mono-timestamp text-primary">3 of 5 photos used today</span>
+</div>
+<!-- Progress Pill -->
+<div class="h-2 w-full bg-surface-container rounded-full overflow-hidden flex">
+<div class="h-full w-[60%] bg-gradient-to-r from-primary to-secondary rounded-full drop-shadow-[0_0_10px_rgba(255,178,184,0.8)] relative">
+<div class="absolute inset-0 bg-white/20 w-full animate-pulse rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Caption Input Field -->
+<div class="relative input-glow transition-all duration-300">
+<input class="w-full bg-transparent border-0 border-b border-surface-variant focus:border-primary focus:ring-0 text-on-surface placeholder:text-surface-variant/60 py-3 font-body-lg text-body-lg outline-none transition-colors" placeholder="Add a caption..." type="text"/>
+</div>
+<!-- Primary Action Button -->
+<button class="w-full py-4 rounded-full bg-gradient-to-r from-primary to-secondary text-on-primary font-body-lg text-body-lg font-bold hover:brightness-110 active:scale-[0.98] transition-all duration-200 shadow-[0_8px_24px_rgba(255,178,184,0.25)] flex justify-center items-center gap-3">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">send</span>
+<span>Send to Arjun</span>
+</button>
+</section>
+</main>
+</body></html>

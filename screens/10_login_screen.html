@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TwoOfUs - Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ffb4ab",
+                        "on-tertiary-container": "#003117",
+                        "inverse-primary": "#ba1340",
+                        "secondary-fixed-dim": "#ffb2bd",
+                        "surface-container-lowest": "#180a0c",
+                        "on-secondary": "#5f1127",
+                        "error-container": "#93000a",
+                        "primary": "#ffb2b8",
+                        "surface-container-high": "#362627",
+                        "surface-bright": "#473536",
+                        "on-primary": "#67001e",
+                        "surface": "#1e0f11",
+                        "on-secondary-fixed-variant": "#7d283c",
+                        "on-secondary-container": "#ff97a9",
+                        "on-surface-variant": "#e2bec0",
+                        "on-tertiary-fixed": "#00210e",
+                        "surface-variant": "#423031",
+                        "primary-fixed": "#ffdadb",
+                        "tertiary-container": "#04a65c",
+                        "on-surface": "#f8dcdd",
+                        "on-primary-container": "#5b0019",
+                        "on-tertiary-fixed-variant": "#00522a",
+                        "on-primary-fixed": "#40000f",
+                        "on-error": "#690005",
+                        "surface-container-low": "#271819",
+                        "tertiary-fixed-dim": "#5bde8d",
+                        "inverse-on-surface": "#3d2c2d",
+                        "secondary-fixed": "#ffd9dd",
+                        "on-primary-fixed-variant": "#91002d",
+                        "surface-container-highest": "#423031",
+                        "on-error-container": "#ffdad6",
+                        "outline-variant": "#5a4042",
+                        "primary-container": "#ff506f",
+                        "surface-container": "#2b1b1d",
+                        "secondary-container": "#7d283c",
+                        "outline": "#a9898b",
+                        "tertiary": "#5bde8d",
+                        "primary-fixed-dim": "#ffb2b8",
+                        "tertiary-fixed": "#7afca7",
+                        "secondary": "#ffb2bd",
+                        "surface-dim": "#1e0f11",
+                        "surface-tint": "#ffb2b8",
+                        "on-tertiary": "#00391b",
+                        "inverse-surface": "#f8dcdd",
+                        "background": "#1e0f11",
+                        "on-background": "#f8dcdd",
+                        "on-secondary-fixed": "#400014"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "120px",
+                        "container-max": "1100px",
+                        "margin-mobile": "20px",
+                        "unit": "8px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["DM Sans"],
+                        "headline-sm": ["Bodoni Moda"],
+                        "display-lg": ["Bodoni Moda"],
+                        "mono-timestamp": ["JetBrains Mono"],
+                        "body-lg": ["DM Sans"],
+                        "body-md": ["DM Sans"],
+                        "label-caps": ["DM Sans"],
+                        "headline-md": ["Bodoni Moda"],
+                        "display-lg-mobile": ["Bodoni Moda"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-sm": ["24px", { "lineHeight": "32px", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "mono-timestamp": ["11px", { "lineHeight": "14px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["36px", { "lineHeight": "42px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&amp;family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=JetBrains+Mono:wght@100..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .floating-input:focus ~ .floating-label,
+        .floating-input:not(:placeholder-shown) ~ .floating-label {
+            transform: translateY(-50%) scale(0.75);
+            top: 25%;
+            color: theme('colors.primary');
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col items-center justify-center relative font-body-md overflow-hidden selection:bg-primary/30">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] max-w-[600px] h-[80vw] max-h-[600px] bg-primary/10 rounded-full blur-[100px] pointer-events-none md:blur-[140px]"></div>
+<main class="w-full max-w-[420px] px-gutter relative z-10 flex flex-col items-center">
+<div class="mb-10 text-primary opacity-80 flex flex-col items-center">
+<span class="material-symbols-outlined text-[40px]" style="font-variation-settings: 'FILL' 0, 'wght' 200;">favorite</span>
+</div>
+<div class="w-full bg-[rgba(22,22,22,0.8)] backdrop-blur-[24px] rounded-2xl p-8 sm:p-10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] border border-white/5 relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-br from-white/[0.04] to-transparent pointer-events-none"></div>
+<h1 class="font-headline-md text-headline-md text-on-surface text-center mb-8 tracking-tight">Welcome back</h1>
+<form class="space-y-5 relative z-10">
+<div class="relative group/input">
+<input class="floating-input w-full bg-surface-container rounded-[14px] px-4 pt-6 pb-2 text-on-surface border border-transparent focus:border-primary/30 focus:bg-surface-container-high transition-all outline-none placeholder-transparent font-body-md text-body-md shadow-inner" id="email" placeholder="Email address" type="email"/>
+<label class="floating-label absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-body-sm text-body-sm transition-all duration-300 pointer-events-none origin-left" for="email">Email address</label>
+<div class="absolute bottom-0 left-4 right-4 h-[1px] bg-primary scale-x-0 group-focus-within/input:scale-x-100 transition-transform duration-500 origin-center opacity-50"></div>
+</div>
+<div class="relative group/input">
+<input class="floating-input w-full bg-surface-container rounded-[14px] px-4 pt-6 pb-2 text-on-surface border border-transparent focus:border-primary/30 focus:bg-surface-container-high transition-all outline-none placeholder-transparent font-body-md text-body-md shadow-inner" id="password" placeholder="Password" type="password"/>
+<label class="floating-label absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-body-sm text-body-sm transition-all duration-300 pointer-events-none origin-left" for="password">Password</label>
+<div class="absolute bottom-0 left-4 right-4 h-[1px] bg-primary scale-x-0 group-focus-within/input:scale-x-100 transition-transform duration-500 origin-center opacity-50"></div>
+</div>
+<div class="flex justify-end pt-2">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors duration-300" href="#">Forgot password?</a>
+</div>
+<button class="w-full mt-10 py-4 rounded-full bg-gradient-to-r from-primary to-secondary text-on-primary font-label-caps text-label-caps tracking-[0.1em] shadow-[0_4px_20px_rgba(255,178,184,0.15)] hover:shadow-[0_4px_25px_rgba(255,178,184,0.3)] transition-all duration-300 active:scale-[0.98]" type="submit">
+                    ENTER SANCTUARY
+                </button>
+</form>
+<div class="mt-8 text-center relative z-10 pt-6 border-t border-white/5">
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                    Don't have an account? 
+                    <a class="text-primary hover:text-secondary transition-colors duration-300 ml-1 font-medium" href="#">Sign Up</a>
+</p>
+</div>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TwoOfUs - Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&amp;family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ffb4ab",
+                        "on-tertiary-container": "#003117",
+                        "inverse-primary": "#ba1340",
+                        "secondary-fixed-dim": "#ffb2bd",
+                        "surface-container-lowest": "#180a0c",
+                        "on-secondary": "#5f1127",
+                        "error-container": "#93000a",
+                        "primary": "#ffb2b8",
+                        "surface-container-high": "#362627",
+                        "surface-bright": "#473536",
+                        "on-primary": "#67001e",
+                        "surface": "#1e0f11",
+                        "on-secondary-fixed-variant": "#7d283c",
+                        "on-secondary-container": "#ff97a9",
+                        "on-surface-variant": "#e2bec0",
+                        "on-tertiary-fixed": "#00210e",
+                        "surface-variant": "#423031",
+                        "primary-fixed": "#ffdadb",
+                        "tertiary-container": "#04a65c",
+                        "on-surface": "#f8dcdd",
+                        "on-primary-container": "#5b0019",
+                        "on-tertiary-fixed-variant": "#00522a",
+                        "on-primary-fixed": "#40000f",
+                        "on-error": "#690005",
+                        "surface-container-low": "#271819",
+                        "tertiary-fixed-dim": "#5bde8d",
+                        "inverse-on-surface": "#3d2c2d",
+                        "secondary-fixed": "#ffd9dd",
+                        "on-primary-fixed-variant": "#91002d",
+                        "surface-container-highest": "#423031",
+                        "on-error-container": "#ffdad6",
+                        "outline-variant": "#5a4042",
+                        "primary-container": "#ff506f",
+                        "surface-container": "#2b1b1d",
+                        "secondary-container": "#7d283c",
+                        "outline": "#a9898b",
+                        "tertiary": "#5bde8d",
+                        "primary-fixed-dim": "#ffb2b8",
+                        "tertiary-fixed": "#7afca7",
+                        "secondary": "#ffb2bd",
+                        "surface-dim": "#1e0f11",
+                        "surface-tint": "#ffb2b8",
+                        "on-tertiary": "#00391b",
+                        "inverse-surface": "#f8dcdd",
+                        "background": "#1e0f11",
+                        "on-background": "#f8dcdd",
+                        "on-secondary-fixed": "#400014"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "120px",
+                        "container-max": "1100px",
+                        "margin-mobile": "20px",
+                        "unit": "8px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["DM Sans"],
+                        "headline-sm": ["Bodoni Moda"],
+                        "display-lg": ["Bodoni Moda"],
+                        "mono-timestamp": ["JetBrains Mono"],
+                        "body-lg": ["DM Sans"],
+                        "body-md": ["DM Sans"],
+                        "label-caps": ["DM Sans"],
+                        "headline-md": ["Bodoni Moda"],
+                        "display-lg-mobile": ["Bodoni Moda"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-sm": ["24px", { "lineHeight": "32px", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "mono-timestamp": ["11px", { "lineHeight": "14px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["36px", { "lineHeight": "42px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        .glass-panel {
+            background: rgba(22, 22, 22, 0.8);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .glass-pill {
+            background: rgba(22, 22, 22, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Ambient animated glow for presence */
+        @keyframes breathGlow {
+            0% { box-shadow: 0 0 10px rgba(255, 178, 189, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(255, 178, 189, 0.7); }
+            100% { box-shadow: 0 0 10px rgba(255, 178, 189, 0.3); }
+        }
+        .presence-glow {
+            animation: breathGlow 4s ease-in-out infinite;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased min-h-screen relative overflow-x-hidden selection:bg-primary/30 selection:text-primary pb-[100px] md:pb-0">
+<!-- Full Bleed Background Image with dark gradient overlay -->
+<div class="fixed inset-0 z-[-1]">
+<img alt="Background" class="w-full h-full object-cover opacity-40 blur-xl scale-110" data-alt="A soft, romantic portrait of a person partially blurred, shot with shallow depth of field. The lighting is moody and cinematic, with soft shadows and subtle warm tones. The image evokes intimacy and memory, fitting for a dark-mode, minimalist interface designed for couples. High-contrast blacks and delicate highlights create an editorial feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXbnpn2yOPaFLiGWPZhm8lm2TVIeZRB8ibBfu0LQdfaky1IICWo2YFgScvI5LcyAeJmiYWcHVkua2rYFB29ofzL_fPA_pknCftCJZsYGwMEUspAw3CXqJOyh-YYzq73w4XUe1eDe-l28Zy7o9yKW-8qo8xUGcChYkNZF6nDK2aU8uk759uyhWssjJB0-tgYWj9fd2uNOQdZidg9ymj2hLXYgDgjPh5XZtQPcQHG7yKl5LPVUFW4yU-mCpNTlA_CFG1k95Mtv0RNQ"/>
+<div class="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background"></div>
+</div>
+<!-- TopAppBar (Hidden on desktop, visible on mobile) -->
+<header class="md:hidden fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile h-16 bg-surface/80 backdrop-blur-24px">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="Partner Profile" class="w-8 h-8 rounded-full object-cover border border-outline-variant/30 presence-glow" data-alt="A close-up, high-fashion portrait of a woman with a gentle expression. Shot against a dark background, the lighting is soft but directional, highlighting her features. The mood is intimate and sophisticated, aligning perfectly with a cinematic, minimalist digital journal aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEV_KAfduvtLqzbg1aLB2WhB0NHTXkE8ynQLwuHf9Eva4gzbbNPaZLWYiTQHS2OJaY_NAesbcoDLwQpOni1cHND8yyZ7ln7rZMNLLmfJZcCwZT2LRVSJgbgRCOA1oa4uLPXW5hGpGkclOWodQMUopWcs1vB60VltjUThMYa22_xXzuyG3MItFXa_ApXHX1much7nnN9oQf0RYCI7QOSpuCBf9Tp35Xi7WBktOe9hq_8sk-75tWtVJZ2CO3hnQEL9tVNTJJfcjiZw"/>
+<div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-secondary rounded-full border border-background"></div>
+</div>
+<h1 class="font-headline-sm text-headline-sm text-on-surface">Us</h1>
+</div>
+<button class="text-primary universal-hover">
+<span class="material-symbols-outlined text-[24px]">videocam</span>
+</button>
+</header>
+<!-- Main Container (Centered for desktop intimacy) -->
+<main class="max-w-container-max mx-auto w-full pt-24 md:pt-16 px-margin-mobile md:px-margin-desktop flex flex-col gap-16 pb-24">
+<!-- Hero Section -->
+<section class="flex flex-col items-center text-center mt-12 md:mt-24 space-y-6">
+<div class="flex items-center gap-4 text-on-surface-variant">
+<h2 class="font-body-lg text-body-lg tracking-wide">Arjun &amp; Priya</h2>
+<span class="material-symbols-outlined text-primary text-[18px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<div class="space-y-2">
+<div class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface drop-shadow-[0_0_15px_rgba(255,178,184,0.15)] leading-none" style="font-size: 72px; line-height: 1;">
+                    427
+                </div>
+<div class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest opacity-80">
+                    days together
+                </div>
+</div>
+<!-- Mood Pills -->
+<div class="flex gap-4 mt-8">
+<div class="glass-pill px-4 py-2 rounded-full flex items-center gap-2">
+<span class="text-xl">☕️</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Sleepy</span>
+</div>
+<div class="glass-pill px-4 py-2 rounded-full flex items-center gap-2">
+<span class="text-xl">🎧</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Focus</span>
+</div>
+</div>
+</section>
+<!-- Photo Strip -->
+<section class="-mx-margin-mobile px-margin-mobile md:mx-0 md:px-0">
+<div class="flex gap-4 overflow-x-auto hide-scrollbar pb-8 pt-4 snap-x snap-mandatory">
+<!-- Photo 1 -->
+<div class="snap-center shrink-0 w-64 h-64 md:w-72 md:h-72 rounded-2xl overflow-hidden glass-panel relative group">
+<img alt="Memory" class="w-full h-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-105" data-alt="Two hands intertwined resting on a table by a window, bathed in soft, moody natural light. The scene is intimate, quiet, and romantic, capturing a candid moment of connection. The aesthetic is dark-mode friendly, with deep shadows and muted, cinematic colors typical of high-end editorial photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFyi4AePUDMdXCfvq61y9iwZAfr1toCOXa4-cYVR2IbXfgm7ptVsYcvjrYZwwFz04CQyE8nGZLPSMGITZTF2xm58a-1ZZGB6h3ZpRb-SDUzJlWkfxGzKOBaoVeTGyAUc2R4bJ8_esDY3u1NjA4IyCgmd4bI5oMfnJ1uwcDqfyARgZBV-uA0yYXJCIo0x-L2pvbpIPH_Yr8GrQCn5S3c9lxlEqwHul7ByAnxQ8fQXXGlh0RX8E7PrfTMJJBplWg1hhnNzJPqmR5VA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4 flex justify-between items-end">
+<span class="font-mono-timestamp text-mono-timestamp text-on-surface-variant">Oct 12</span>
+<span class="material-symbols-outlined text-primary text-[20px]">push_pin</span>
+</div>
+</div>
+<!-- Photo 2 -->
+<div class="snap-center shrink-0 w-64 h-64 md:w-72 md:h-72 rounded-2xl overflow-hidden glass-panel relative group -ml-6 md:-ml-8 shadow-[10px_0_20px_rgba(0,0,0,0.5)] z-10">
+<img alt="Memory" class="w-full h-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-105" data-alt="A blurred cityscape at night with glowing bokeh lights from streetlamps and cars. The mood is nostalgic, urban, and romantic, evoking the feeling of a late-night drive or walk together. The color palette features deep blacks contrasted with warm amber and soft red light orbs, perfectly matching a cinematic dark theme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCozsaUEuu43jSoSHJfD3bKiouOAZ_MQoK0Tyc7tT4ggyb1Muwl_7LIwv1Ac6ieIEBTvJrvZe9bPMl1aRe68ljIOaq3yOhTD6YYonzxaYwLETUO99QjQXzjtS0pbWc-qJhQfujkjRcZH7FsJ45i1303JZchbDTclNHX_DMEfNo0Wp0YNkR7muBNHvQTpO7ISFo7t3WjBpHNWdUA6IxwM0JhWcDF2HsiYCtLaRBRt8zDEpKolQ2tPjcyJ0R2wZ41kYCO-SUdzAq-Ag"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4 flex justify-between items-end">
+<span class="font-mono-timestamp text-mono-timestamp text-on-surface-variant">Sep 28</span>
+</div>
+</div>
+<!-- Photo 3 -->
+<div class="snap-center shrink-0 w-64 h-64 md:w-72 md:h-72 rounded-2xl overflow-hidden glass-panel relative group -ml-6 md:-ml-8 shadow-[10px_0_20px_rgba(0,0,0,0.5)] z-20">
+<img alt="Memory" class="w-full h-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-105" data-alt="Two coffee cups on a dark wooden cafe table, steam lightly rising. The setting is cozy, moody, and dimly lit, emphasizing an intimate morning or late afternoon conversation. The tones are rich, with deep browns and blacks, shot in a high-contrast editorial style suitable for a minimalist journal interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBE1Mi1Vv89XcOsIlvdSOj6GMkeuorlMXS6e8CoOy4OCp8GwFluYzAOKXvfbfC1YtLdH4HvYRw9tIwoVJWUqCKuPF8M2wFWtN08lxjW7gawOhZdnpfb6I5Trk3bDD6RHdqCGxFx0xP7j1KpMqCSwR1basx4EE4GhblEiVfSkf11kUVpwjyQiFxZcX3w5aWjxFta5Tq1n954-am4s4OxpjyTw6vE_t6IFcgCakn-SGDLrkyjgAkrdUKlNjUDZYf9RfbLXINq3whkhQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4 flex justify-between items-end">
+<span class="font-mono-timestamp text-mono-timestamp text-on-surface-variant">Aug 14</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Our Song Card -->
+<section class="max-w-md mx-auto w-full">
+<div class="glass-panel rounded-2xl p-6 flex flex-col gap-6 relative overflow-hidden">
+<!-- Subtle gradient glow in top left -->
+<div class="absolute -top-10 -left-10 w-32 h-32 bg-primary/20 blur-[40px] rounded-full"></div>
+<div class="flex items-start justify-between relative z-10">
+<div>
+<div class="font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Our Song</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Sparks</h3>
+<p class="font-body-sm text-body-sm text-outline">Coldplay</p>
+</div>
+<div class="w-12 h-12 rounded-full glass-pill flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+<!-- Fake Waveform (CSS generated lines) -->
+<div class="flex items-center gap-1 h-8 w-full relative z-10">
+<div class="w-1 bg-primary/40 rounded-full h-full animate-pulse" style="animation-duration: 1.2s"></div>
+<div class="w-1 bg-primary/60 rounded-full h-3/4 animate-pulse" style="animation-duration: 0.8s"></div>
+<div class="w-1 bg-primary rounded-full h-1/2"></div>
+<div class="w-1 bg-primary/80 rounded-full h-full animate-pulse" style="animation-duration: 1.5s"></div>
+<div class="w-1 bg-primary/40 rounded-full h-2/3"></div>
+<div class="w-1 bg-outline-variant rounded-full h-1/4"></div>
+<div class="w-1 bg-outline-variant rounded-full h-1/2"></div>
+<div class="w-1 bg-outline-variant rounded-full h-1/3"></div>
+<div class="w-1 bg-outline-variant rounded-full h-3/4"></div>
+<div class="w-1 bg-outline-variant rounded-full h-1/2"></div>
+<div class="w-1 bg-outline-variant rounded-full h-1/4"></div>
+<div class="w-1 bg-outline-variant rounded-full h-1/3"></div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Hidden on desktop, visible on mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-gutter pb-safe bg-surface-container/80 backdrop-blur-24px border-t border-outline-variant/10 shadow-[0_-4px_20px_rgba(0,0,0,0.4)] h-[80px] rounded-t-xl">
+<!-- Active Item: Home -->
+<a class="flex flex-col items-center justify-center text-primary drop-shadow-[0_0_8px_rgba(255,178,184,0.6)] scale-110 duration-300 ease-out hover:text-primary/80 transition-all" href="#">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-caps text-label-caps mt-1">Home</span>
+</a>
+<!-- Inactive Items -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary/80 transition-all" href="#">
+<span class="material-symbols-outlined text-[24px]">chat_bubble</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary/80 transition-all" href="#">
+<span class="material-symbols-outlined text-[24px]">photo_camera</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary/80 transition-all" href="#">
+<span class="material-symbols-outlined text-[24px]">call</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary/80 transition-all" href="#">
+<span class="material-symbols-outlined text-[24px]">settings</span>
+</a>
+</nav>
+<!-- Desktop Navigation Structure (Hidden on mobile) -->
+<nav class="hidden md:flex fixed top-0 left-0 w-full z-50 justify-between items-center px-margin-desktop h-20 bg-surface/80 backdrop-blur-24px border-b border-white/5">
+<h1 class="font-headline-sm text-headline-sm text-on-surface tracking-widest uppercase">Us</h1>
+<div class="flex gap-8">
+<a class="text-primary font-bold font-body-sm text-body-sm uppercase tracking-widest drop-shadow-[0_0_8px_rgba(255,178,184,0.4)]" href="#">Home</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors font-body-sm text-body-sm uppercase tracking-widest" href="#">Messages</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors font-body-sm text-body-sm uppercase tracking-widest" href="#">Gallery</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[24px]">call</span>
+</button>
+<div class="relative">
+<img alt="Partner Profile" class="w-10 h-10 rounded-full object-cover border border-outline-variant/30 presence-glow" data-alt="A close-up, high-fashion portrait of a woman with a gentle expression. Shot against a dark background, the lighting is soft but directional, highlighting her features. The mood is intimate and sophisticated, aligning perfectly with a cinematic, minimalist digital journal aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCspuKAA9njjmqgI9LRVnHGrseGkSe1M6CWzcOgJ7bSgCQ0tDipymw_p-qFTS6_y8_i3X977JtlacxZV6VXVhL_ukCoHudVy39e0Hmtd-JfJoq6WRwceWPx3N9p8GVRzR_qi24QanLoz5_JkmMRPVrPMPM-8ghqEaU4XqOH_jqz-jV-FVEVBEYYpisY_sedTrOpL2bpHKgwC1Qe4gDLB85okZDqwwhn8_qr34UdxJfP8ADrXkZIu0jH6r5WfxFzyslFerPBplFLdw"/>
+</div>
+</div>
+</nav>
+</body></html>

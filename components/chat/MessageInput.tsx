@@ -1,0 +1,203 @@
+'use client';
+
+import { useState, useRef, useEffect } from 'react';
+import { getSupabase } from '@/lib/supabase/client';
+import { encryptMessage, encryptFile, encryptSymmetricKey } from '@/lib/crypto/e2ee';
+import { getMyKeys } from '@/lib/crypto/keyManager';
+import { useAuthStore } from '@/lib/store/authStore';
+import { decodeBase64, encodeBase64 } from 'tweetnacl-util';
+import { usePhotoQuota } from '@/hooks/usePhotoQuota';
+import { useToastStore } from '@/lib/store/toastStore';
+
+export default function MessageInput() {
+  const [text, setText] = useState('');
+  const [sending, setSending] = useState(false);
+  const { couple, partner, user } = useAuthStore();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const channelRef = useRef<ReturnType<ReturnType<typeof getSupabase>['channel']> | null>(null);
+  const { canUpload, incrementQuota, remaining } = usePhotoQuota();
+  const { show: showToast } = useToastStore();
+
+  // Subscribe to typing channel once
+  useEffect(() => {
+    if (!couple?.id) return;
+    const supabase = getSupabase();
+    const channel = supabase.channel(`typing:${couple.id}`);
+    channel.subscribe();
+    channelRef.current = channel;
+
+    return () => {
+      channel.unsubscribe();
+      channelRef.current = null;
+    };
+  }, [couple?.id]);
+
+  const sendTypingIndicator = () => {
+    if (!channelRef.current || !user?.id) return;
+    channelRef.current.send({ type: 'broadcast', event: 'typing', payload: { userId: user.id } });
+
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = setTimeout(() => {
+      channelRef.current?.send({ type: 'broadcast', event: 'stop_typing', payload: { userId: user?.id } });
+    }, 2000);
+  };
+
+  const handleSend = async () => {
+    if (!text.trim() || !couple?.id || !partner?.public_key || sending) return;
+    setSending(true);
+
+    const keys = getMyKeys();
+    if (!keys) { setSending(false); return; }
+
+    const partnerPub = decodeBase64(partner.public_key);
+    const { ciphertext, nonce } = encryptMessage(text.trim(), partnerPub, keys.secretKey);
+
+    const supabase = getSupabase();
+    await supabase.from('messages').insert({
+      couple_id: couple.id,
+      sender_id: user?.id,
+      ciphertext,
+      nonce,
+      type: 'text',
+    });
+
+    setText('');
+    setSending(false);
+    inputRef.current?.focus();
+  };
+
+  const handlePhotoClick = () => {
+    if (!canUpload) {
+      showToast('Daily photo quota reached (5 photos max)', 'error');
+      return;
+    }
+    fileInputRef.current?.click();
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !couple?.id || !partner?.public_key || !user?.id || sending) return;
+
+    setSending(true);
+    showToast('Encrypting and uploading photo...', 'info');
+
+    try {
+      const keys = getMyKeys();
+      if (!keys) {
+        showToast('Decryption keys not loaded. Please re-login.', 'error');
+        setSending(false);
+        return;
+      }
+
+      // 1. Read file as ArrayBuffer & encrypt
+      const arrayBuffer = await file.arrayBuffer();
+      const fileBytes = new Uint8Array(arrayBuffer);
+      const { encrypted, key, nonce } = encryptFile(fileBytes);
+
+      // 2. Encrypt symmetric key with partner's public key
+      const partnerPub = decodeBase64(partner.public_key);
+      const { encryptedKey, keyNonce } = encryptSymmetricKey(key, partnerPub, keys.secretKey);
+
+      // 3. Upload encrypted file to Supabase Storage
+      const supabase = getSupabase();
+      const fileExt = file.name.split('.').pop() || 'jpg';
+      const storagePath = `${couple.id}/${crypto.randomUUID()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('photos')
+        .upload(storagePath, encrypted, {
+          contentType: 'application/octet-stream',
+          cacheControl: '3600',
+        });
+
+      if (uploadError) throw uploadError;
+
+      // 4. Update local and remote photo quota
+      const allowed = await incrementQuota();
+      if (!allowed) {
+        showToast('Daily photo quota reached!', 'error');
+        setSending(false);
+        return;
+      }
+
+      // 5. Insert into photos table
+      const { error: photoDbError } = await supabase.from('photos').insert({
+        couple_id: couple.id,
+        sender_id: user.id,
+        storage_path: storagePath,
+        encrypted_key: `${encryptedKey}:${keyNonce}`,
+        nonce: encodeBase64(nonce),
+      });
+
+      if (photoDbError) throw photoDbError;
+
+      // 6. Create message containing E2EE details for partner to decrypt
+      const photoMetadata = JSON.stringify({
+        storagePath,
+        encryptedKey,
+        keyNonce,
+        fileNonce: encodeBase64(nonce),
+      });
+
+      const { ciphertext, nonce: msgNonce } = encryptMessage(photoMetadata, partnerPub, keys.secretKey);
+
+      const { error: messageDbError } = await supabase.from('messages').insert({
+        couple_id: couple.id,
+        sender_id: user.id,
+        ciphertext,
+        nonce: msgNonce,
+        type: 'photo',
+      });
+
+      if (messageDbError) throw messageDbError;
+
+      showToast(`Photo shared! (${remaining - 1} remaining today)`, 'success');
+    } catch (err: any) {
+      console.error(err);
+      showToast(err.message || 'Failed to upload photo', 'error');
+    } finally {
+      setSending(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  return (
+    <div className="fixed bottom-[80px] md:bottom-0 left-0 w-full z-40 bg-surface-container/80 backdrop-blur-xl border-t border-outline-variant/10 px-4 py-3">
+      <div className="max-w-[1100px] mx-auto flex items-center gap-3">
+        <button
+          onClick={handlePhotoClick}
+          disabled={sending}
+          className="text-on-surface-variant hover:text-primary transition-colors flex-shrink-0 disabled:opacity-50"
+          aria-label="Send photo"
+        >
+          <span className="material-symbols-outlined text-[24px]">photo_camera</span>
+        </button>
+        <input
+          type="file"
+          ref={fileInputRef}
+          accept="image/*"
+          className="hidden"
+          onChange={handlePhotoUpload}
+        />
+        <div className="flex-1 relative">
+          <input
+            ref={inputRef}
+            type="text"
+            value={text}
+            onChange={(e) => { setText(e.target.value); sendTypingIndicator(); }}
+            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+            placeholder="Type a message..."
+            className="w-full bg-surface-variant/30 text-on-surface rounded-full px-5 py-3 text-base outline-none border border-outline-variant/20 focus:border-primary/50 transition-colors placeholder:text-outline"
+            style={{ fontFamily: 'var(--font-body)' }}
+          />
+        </div>
+        <button onClick={handleSend} disabled={!text.trim() || sending} aria-label="Send message"
+          className="w-12 h-12 rounded-full btn-primary flex items-center justify-center disabled:opacity-30 transition-all flex-shrink-0">
+          <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>send</span>
+        </button>
+      </div>
+    </div>
+  );
+}

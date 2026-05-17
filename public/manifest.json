@@ -1,0 +1,29 @@
+{
+  "name": "TwoOfUs",
+  "short_name": "TwoOfUs",
+  "description": "A private, end-to-end encrypted communication app for couples",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#1e0f11",
+  "background_color": "#1e0f11",
+  "start_url": "/",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

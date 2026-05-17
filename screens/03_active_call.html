@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TwoOfUs - Active Video Call</title>
+<!-- Google Fonts: DM Sans & Bodoni Moda -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&amp;family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Theme Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#ffb4ab",
+                    "on-tertiary-container": "#003117",
+                    "inverse-primary": "#ba1340",
+                    "secondary-fixed-dim": "#ffb2bd",
+                    "surface-container-lowest": "#180a0c",
+                    "on-secondary": "#5f1127",
+                    "error-container": "#93000a",
+                    "primary": "#ffb2b8",
+                    "surface-container-high": "#362627",
+                    "surface-bright": "#473536",
+                    "on-primary": "#67001e",
+                    "surface": "#1e0f11",
+                    "on-secondary-fixed-variant": "#7d283c",
+                    "on-secondary-container": "#ff97a9",
+                    "on-surface-variant": "#e2bec0",
+                    "on-tertiary-fixed": "#00210e",
+                    "surface-variant": "#423031",
+                    "primary-fixed": "#ffdadb",
+                    "tertiary-container": "#04a65c",
+                    "on-surface": "#f8dcdd",
+                    "on-primary-container": "#5b0019",
+                    "on-tertiary-fixed-variant": "#00522a",
+                    "on-primary-fixed": "#40000f",
+                    "on-error": "#690005",
+                    "surface-container-low": "#271819",
+                    "tertiary-fixed-dim": "#5bde8d",
+                    "inverse-on-surface": "#3d2c2d",
+                    "secondary-fixed": "#ffd9dd",
+                    "on-primary-fixed-variant": "#91002d",
+                    "surface-container-highest": "#423031",
+                    "on-error-container": "#ffdad6",
+                    "outline-variant": "#5a4042",
+                    "primary-container": "#ff506f",
+                    "surface-container": "#2b1b1d",
+                    "secondary-container": "#7d283c",
+                    "outline": "#a9898b",
+                    "tertiary": "#5bde8d",
+                    "primary-fixed-dim": "#ffb2b8",
+                    "tertiary-fixed": "#7afca7",
+                    "secondary": "#ffb2bd",
+                    "surface-dim": "#1e0f11",
+                    "surface-tint": "#ffb2b8",
+                    "on-tertiary": "#00391b",
+                    "inverse-surface": "#f8dcdd",
+                    "background": "#1e0f11",
+                    "on-background": "#f8dcdd",
+                    "on-secondary-fixed": "#400014"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "120px",
+                    "container-max": "1100px",
+                    "margin-mobile": "20px",
+                    "unit": "8px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "body-sm": ["DM Sans"],
+                    "headline-sm": ["Bodoni Moda"],
+                    "display-lg": ["Bodoni Moda"],
+                    "mono-timestamp": ["JetBrains Mono"],
+                    "body-lg": ["DM Sans"],
+                    "body-md": ["DM Sans"],
+                    "label-caps": ["DM Sans"],
+                    "headline-md": ["Bodoni Moda"],
+                    "display-lg-mobile": ["Bodoni Moda"]
+            },
+            "fontSize": {
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "mono-timestamp": ["11px", {"lineHeight": "14px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "display-lg-mobile": ["36px", {"lineHeight": "42px", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        /* Custom base styles ensuring dark mode canvas */
+        body {
+            background-color: #1e0f11;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background h-screen w-full relative overflow-hidden flex justify-center items-center">
+<!-- Primary Video Stream (Partner) Background -->
+<div class="absolute inset-0 z-0 bg-cover bg-center w-full h-full object-cover" data-alt="A cinematic, softly lit portrait of a young person looking directly into the camera, representing a partner on a video call. The lighting is moody and romantic, featuring deep shadows and warm, gentle highlights that align with a dark-mode luxury aesthetic. The background is a beautifully blurred, minimalist interior setting at night, illuminated by a single warm lamp. The overall mood is intimate, private, and emotionally connected, emphasizing the feeling of a late-night personal conversation." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA6PpY2lbtaCQfFXs7EfKZIbekYRKDC2uUWObrJNb_JF2iZ1HPSU1nKSkP-tU-s8r0v6LKdb6lOakdX4BmiL2K4wcsigogsf8xeVqF85v_sY34AP2R_SNk7TrkfPzJTbF3WOVus5NEfJO6LsUIlFLgP2-Ofzk9VfF6GkgKAJvaio4VQh0tBiTXSmv2ytTEnoHEB1k2aCE_UV1IEgWz9sqxnwTN0sMUnZiL8Q9quy4FEEo76n5VPfC_wod3P5gSsBAMs-nWk1iTsig');">
+</div>
+<!-- Dark Gradient Overlays for Readability -->
+<div class="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-background/80 via-background/30 to-transparent z-10 pointer-events-none"></div>
+<div class="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-background/90 via-background/50 to-transparent z-10 pointer-events-none"></div>
+<!-- UI Overlay Container -->
+<div class="absolute inset-0 z-20 flex flex-col justify-between p-margin-mobile md:px-margin-desktop md:py-[40px] pointer-events-none w-full max-w-container-max mx-auto">
+<!-- Top Row: Header Pill & PiP -->
+<div class="flex justify-between items-start w-full pointer-events-auto relative">
+<!-- Centered Header Pill (Partner Name & Duration) -->
+<div class="absolute left-1/2 -translate-x-1/2 flex items-center gap-3 bg-surface/50 backdrop-blur-[24px] px-5 py-2 rounded-full border border-outline-variant/30 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
+<span class="w-2 h-2 rounded-full bg-error animate-pulse shadow-[0_0_8px_rgba(255,180,171,0.8)]"></span>
+<span class="font-body-md text-body-md text-on-surface tracking-wide">Alex</span>
+<span class="text-outline-variant/60">|</span>
+<span class="font-mono-timestamp text-mono-timestamp text-on-surface-variant">04:32</span>
+</div>
+<!-- Self Video PiP (Top Right) -->
+<div class="ml-auto w-[100px] h-[140px] md:w-[140px] md:h-[200px] rounded-[16px] overflow-hidden border-[1.5px] border-outline/40 shadow-[0_8px_32px_rgba(0,0,0,0.6)] bg-surface relative group cursor-pointer transition-transform duration-300 hover:scale-105">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="A close-up selfie-style portrait of a person softly illuminated by the glow of a device screen in a dark room. The image serves as a picture-in-picture video feed in a minimalist luxury app interface. The lighting is cool and subdued, contrasting with a deep obsidian background to maintain the high-contrast cinematic editorial style. The expression is relaxed and focused, capturing a quiet moment of connection during an intimate digital interaction." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDCTzqr52qPWONjUD4enJLo96HrGEleXf3hX693NbSHkNsX1HUVbiAO42wgTWmvsDBVOi8AvvHlg-qY9wTJ7wmrTWY6r8yIS50D8JRq1bEGBlYFgnKhnB0hhKPpYRai6FyeCLoyTf3WGOCwjm3pbXh3sHxfRN2yikNreRvPMalzperdRj1WI-G0vY0vaEYjtV_7RiiCNTibtkFi2YTEVNW6PFoayDA6flJaF1JgWSuAhJWWQzXm-RnWSLeBkh6qbsvEMfRP5xg_3g');">
+</div>
+<!-- Subtle inner catchlight for glass effect on PiP -->
+<div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none rounded-[16px]"></div>
+</div>
+</div>
+<!-- Bottom Row: Control Bar -->
+<div class="w-full flex justify-center pb-8 pointer-events-auto">
+<div class="flex items-center gap-4 md:gap-6 bg-surface-container/60 backdrop-blur-[24px] px-6 md:px-8 py-4 md:py-5 rounded-full border border-outline-variant/20 shadow-[0_12px_40px_rgba(0,0,0,0.5)]">
+<!-- Mute Toggle -->
+<button class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-surface-variant/40 flex justify-center items-center text-on-surface hover:bg-surface-variant/80 transition-all duration-300 border border-outline-variant/30 hover:border-outline/50 group">
+<span class="material-symbols-outlined text-[24px] md:text-[28px] group-hover:scale-110 transition-transform">mic</span>
+</button>
+<!-- Video Toggle -->
+<button class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-surface-variant/40 flex justify-center items-center text-on-surface hover:bg-surface-variant/80 transition-all duration-300 border border-outline-variant/30 hover:border-outline/50 group">
+<span class="material-symbols-outlined text-[24px] md:text-[28px] group-hover:scale-110 transition-transform">videocam</span>
+</button>
+<!-- Flip Camera -->
+<button class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-surface-variant/40 flex justify-center items-center text-on-surface hover:bg-surface-variant/80 transition-all duration-300 border border-outline-variant/30 hover:border-outline/50 group">
+<span class="material-symbols-outlined text-[24px] md:text-[28px] group-hover:scale-110 transition-transform text-on-surface-variant">cameraswitch</span>
+</button>
+<!-- Divider -->
+<div class="w-px h-8 bg-outline-variant/30 mx-1 md:mx-2"></div>
+<!-- End Call (Primary Destructive Action) -->
+<button class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-error to-error-container flex justify-center items-center text-on-error hover:opacity-90 transition-all duration-300 shadow-[0_0_24px_rgba(255,180,171,0.3)] hover:shadow-[0_0_32px_rgba(255,180,171,0.5)] hover:scale-105 group border border-error/50">
+<span class="material-symbols-outlined text-[32px] md:text-[36px] group-hover:rotate-12 transition-transform" style="font-variation-settings: 'FILL' 1;">call_end</span>
+</button>
+</div>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TwoOfUs - Component Style Guide</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&amp;family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=JetBrains+Mono:wght@400..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ffb4ab",
+                        "on-tertiary-container": "#003117",
+                        "inverse-primary": "#ba1340",
+                        "secondary-fixed-dim": "#ffb2bd",
+                        "surface-container-lowest": "#180a0c",
+                        "on-secondary": "#5f1127",
+                        "error-container": "#93000a",
+                        "primary": "#ffb2b8",
+                        "surface-container-high": "#362627",
+                        "surface-bright": "#473536",
+                        "on-primary": "#67001e",
+                        "surface": "#1e0f11",
+                        "on-secondary-fixed-variant": "#7d283c",
+                        "on-secondary-container": "#ff97a9",
+                        "on-surface-variant": "#e2bec0",
+                        "on-tertiary-fixed": "#00210e",
+                        "surface-variant": "#423031",
+                        "primary-fixed": "#ffdadb",
+                        "tertiary-container": "#04a65c",
+                        "on-surface": "#f8dcdd",
+                        "on-primary-container": "#5b0019",
+                        "on-tertiary-fixed-variant": "#00522a",
+                        "on-primary-fixed": "#40000f",
+                        "on-error": "#690005",
+                        "surface-container-low": "#271819",
+                        "tertiary-fixed-dim": "#5bde8d",
+                        "inverse-on-surface": "#3d2c2d",
+                        "secondary-fixed": "#ffd9dd",
+                        "on-primary-fixed-variant": "#91002d",
+                        "surface-container-highest": "#423031",
+                        "on-error-container": "#ffdad6",
+                        "outline-variant": "#5a4042",
+                        "primary-container": "#ff506f",
+                        "surface-container": "#2b1b1d",
+                        "secondary-container": "#7d283c",
+                        "outline": "#a9898b",
+                        "tertiary": "#5bde8d",
+                        "primary-fixed-dim": "#ffb2b8",
+                        "tertiary-fixed": "#7afca7",
+                        "secondary": "#ffb2bd",
+                        "surface-dim": "#1e0f11",
+                        "surface-tint": "#ffb2b8",
+                        "on-tertiary": "#00391b",
+                        "inverse-surface": "#f8dcdd",
+                        "background": "#1e0f11",
+                        "on-background": "#f8dcdd",
+                        "on-secondary-fixed": "#400014"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "120px",
+                        "container-max": "1100px",
+                        "margin-mobile": "20px",
+                        "unit": "8px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["DM Sans"],
+                        "headline-sm": ["Bodoni Moda"],
+                        "display-lg": ["Bodoni Moda"],
+                        "mono-timestamp": ["JetBrains Mono"],
+                        "body-lg": ["DM Sans"],
+                        "body-md": ["DM Sans"],
+                        "label-caps": ["DM Sans"],
+                        "headline-md": ["Bodoni Moda"],
+                        "display-lg-mobile": ["Bodoni Moda"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-sm": ["24px", { "lineHeight": "32px", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "mono-timestamp": ["11px", { "lineHeight": "14px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["36px", { "lineHeight": "42px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-card {
+            background-color: rgba(22, 22, 22, 0.8);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid transparent;
+            background-image: linear-gradient(rgba(22, 22, 22, 0.8), rgba(22, 22, 22, 0.8)), linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.02) 100%);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+        }
+        .presence-glow {
+            box-shadow: 0 0 15px var(--tw-colors-secondary);
+        }
+        /* Custom properties for gradient text to avoid inline styles issues */
+        .text-gradient-primary {
+            background: linear-gradient(to right, #ffb2b8, #ffb2bd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen selection:bg-primary/30 antialiased overflow-x-hidden">
+<!-- Top Navigation Anchor (Desktop only logic applied conceptually) -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16 bg-surface/80 backdrop-blur-xl">
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border border-outline/20">
+<img alt="Partner Profile Photo" class="w-full h-full object-cover" data-alt="A close-up portrait of an elegant woman with soft, natural lighting. The mood is intimate and romantic, matching a high-end cinematic editorial style. The background is slightly blurred with deep, rich obsidian tones, contrasting with her softly lit face. The overall aesthetic is dark mode minimalism with a focus on emotional resonance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1i_v67aeF1C_fsrWmNsoDQkSXT1Tq0tk9UKRIuVxxHgtedcLePU4B4cDBHSE7Nm5-VI_miZuDZ0mJIUQjxU1DXuoKVV7NSxK_4hUUpavvFoJrxJWZruaQLR0ldJYy_2hWf81FLW38_QQT_c9Dn2EOBcEt8qLuBrSzB_UNDQpUlbYU3KX1UzseG4WM1ATz3WkrQzvxCedCb3OAwd4KjG0y-LX0JZZdQpmIYodxTn_L86LVpJfb6Rx5fHMdaEi_FdoReNTaTY2qPw"/>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">Us</span>
+</div>
+<div class="flex items-center text-on-surface-variant hover:opacity-80 transition-opacity cursor-pointer">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 0;">videocam</span>
+</div>
+</header>
+<main class="pt-24 pb-32 md:pb-24 px-margin-mobile md:px-0 max-w-container-max mx-auto md:w-[600px] flex flex-col gap-16">
+<!-- Title Section -->
+<section class="mb-12">
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg mb-4">Design Tokens</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">A cinematic, intimate gallery of shared memories. Minimalism meets glassmorphism on an obsidian canvas.</p>
+</section>
+<!-- Buttons -->
+<section class="flex flex-col gap-8">
+<h2 class="font-headline-md text-headline-md border-b border-surface-container-high pb-4">Buttons</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="flex flex-col gap-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant">Primary Gradient</span>
+<button class="bg-gradient-to-r from-primary to-secondary text-surface-container-lowest font-body-md text-body-md font-bold py-3 px-6 rounded-full hover:opacity-90 transition-opacity w-fit shadow-[0_4px_14px_rgba(255,178,184,0.2)]">
+                        Save Memory
+                    </button>
+<p class="font-mono-timestamp text-mono-timestamp text-outline">Pill-shaped, linear gradient. 300ms ease opacity hover.</p>
+</div>
+<div class="flex flex-col gap-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant">Secondary Ghost</span>
+<button class="bg-transparent border border-white/10 text-on-surface font-body-md text-body-md py-3 px-6 rounded-full hover:bg-white/5 transition-all w-fit shadow-[inset_0_0_0_rgba(255,255,255,0)] hover:shadow-[inset_0_0_10px_rgba(255,255,255,0.05)]">
+                        View Details
+                    </button>
+<p class="font-mono-timestamp text-mono-timestamp text-outline">Transparent, 1px border. Inner glow on hover.</p>
+</div>
+<div class="flex flex-col gap-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant">Destructive / Error</span>
+<button class="bg-error-container text-on-error-container font-body-md text-body-md py-3 px-6 rounded-full hover:bg-error hover:text-on-error transition-colors w-fit">
+                        Delete
+                    </button>
+<p class="font-mono-timestamp text-mono-timestamp text-outline">Uses error palette mapping.</p>
+</div>
+</div>
+</section>
+<!-- Inputs -->
+<section class="flex flex-col gap-8">
+<h2 class="font-headline-md text-headline-md border-b border-surface-container-high pb-4">Input Fields</h2>
+<div class="flex flex-col gap-8">
+<div class="flex flex-col gap-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant mb-2">Default State</span>
+<div class="relative w-full">
+<input class="w-full bg-transparent border-0 border-b border-surface-variant text-on-surface font-body-md text-body-md focus:ring-0 focus:border-b-primary focus:border-b-2 px-0 py-2 placeholder-outline-variant transition-all" placeholder="Write a memory..." type="text"/>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant mb-2">Focused State</span>
+<div class="relative w-full">
+<input class="w-full bg-transparent border-0 border-b-2 border-primary text-on-surface font-body-md text-body-md focus:ring-0 px-0 py-2 transition-all shadow-[0_4px_10px_rgba(255,178,184,0.1)]" type="text" value="Our first trip to Kyoto"/>
+</div>
+<p class="font-mono-timestamp text-mono-timestamp text-outline mt-1">1px line glows Primary Accent when focused.</p>
+</div>
+<div class="flex flex-col gap-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant mb-2">Error State</span>
+<div class="relative w-full">
+<input class="w-full bg-transparent border-0 border-b-2 border-error text-error font-body-md text-body-md focus:ring-0 px-0 py-2 transition-all" type="text" value="Invalid date format"/>
+</div>
+<span class="font-body-sm text-body-sm text-error mt-1">Please enter a valid date.</span>
+</div>
+</div>
+</section>
+<!-- Message Bubbles -->
+<section class="flex flex-col gap-8">
+<h2 class="font-headline-md text-headline-md border-b border-surface-container-high pb-4">Conversation Elements</h2>
+<div class="flex flex-col gap-8 p-6 bg-surface-container-lowest rounded-2xl border border-surface-container-high">
+<!-- Their Message -->
+<div class="flex gap-3 max-w-[85%]">
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden shrink-0 mt-auto">
+<img alt="Partner Avatar" class="w-full h-full object-cover" data-alt="A small circular avatar showing a close-up portrait of a woman. Cinematic lighting, intimate mood, dark background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9-g9ACnh3gdxxJzUg8L_hxoaa2IUvhw95_dpDLRCWF4owY2RsbKogyR4RVB7bw9RJ2dqL1Vp0oYYXKxoIwqHUZW06k4g2uNl9QW4GpPI06BZDknfO-NEqUCg67HP4L8ETBRBPm92L267ORERfVd9JZ5GwcYmO4eudHAaw2ITE8b_0Qxc_kYlG_24BRXaUm4_4AfvuEMhPpc3I9qvhdQFv1w18Ep7HwXNy1uCq8siMaMyZ_SX8a7UtqQsgd-HAKfrCkH3MC5cRpw"/>
+</div>
+<div class="flex flex-col gap-1">
+<div class="glass-card rounded-2xl rounded-bl-sm p-4 text-on-surface font-body-md text-body-md">
+                            Thinking about that coffee shop in Rome.
+                        </div>
+<span class="font-mono-timestamp text-mono-timestamp text-outline-variant ml-2">10:42 AM</span>
+</div>
+</div>
+<!-- My Message -->
+<div class="flex flex-col gap-1 items-end max-w-[85%] self-end">
+<div class="bg-primary-container text-on-primary-container rounded-2xl rounded-br-sm p-4 font-body-md text-body-md shadow-[0_4px_20px_rgba(255,80,111,0.15)]">
+                        Take me back. The espresso was perfect.
+                    </div>
+<span class="font-mono-timestamp text-mono-timestamp text-outline-variant mr-2">10:45 AM • Read</span>
+</div>
+<!-- Photo Message -->
+<div class="flex flex-col gap-1 items-end max-w-[85%] self-end">
+<div class="relative rounded-2xl rounded-br-sm overflow-hidden border border-outline/20">
+<img alt="Shared Memory Photo" class="w-64 h-48 object-cover" data-alt="A cinematic, moody photograph of two cups of espresso on a dark, textured cafe table. Soft window light spills across the table, creating a dramatic, romantic atmosphere. Deep blacks, warm sepia tones, and high contrast." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBShhMTLWeRNN3jSbu1vJIyYzcUcRCgtmK-bWuSrPpPLDXXWVCSFb5rsOJViPSuyXXUK23uOFLaLXcca4fWpF4MZFYl9WcXjJZVqtnGfnTOoLbrrm3aYqsvLfnP4LoDIgdbkKHNdPEQTgMvEe92g-fAzf0k8Zp89-N9JhOinIh5HPjXdQMUrS9PjZTIT_UQUPhobS7AyXZWRFQpVWFiKIEE9WrEVNcZrjgos2DBkGNJSxkZCk8xZvezypC-BpApaaPd9VcHKyfxcg"/>
+<!-- Reaction -->
+<div class="absolute -bottom-3 -left-3 bg-surface border border-surface-variant rounded-full p-1.5 flex items-center justify-center shadow-lg">
+<span class="text-xl">❤️</span>
+</div>
+</div>
+<span class="font-mono-timestamp text-mono-timestamp text-outline-variant mr-2 mt-3">10:46 AM</span>
+</div>
+</div>
+</section>
+<!-- Presence & Avatars -->
+<section class="flex flex-col gap-8">
+<h2 class="font-headline-md text-headline-md border-b border-surface-container-high pb-4">Identity &amp; Presence</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+<div class="flex flex-col gap-6">
+<span class="font-label-caps text-label-caps text-on-surface-variant">Presence Glow (Online)</span>
+<div class="flex items-center gap-6">
+<div class="relative">
+<div class="w-16 h-16 rounded-full overflow-hidden border-2 border-surface presence-glow animate-pulse">
+<img alt="Online Partner" class="w-full h-full object-cover" data-alt="Avatar portrait of a woman, dark moody lighting, cinematic editorial style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQAoCHqjZCN5pZQD67r12xUgmwJTSlyE3moS8WTBykk_ohf3mNxg1kFVsg2f89VzzrqZVNTLcXiZPqc9qa4ZlJyRU0IQ04hvQ4N2DClJWngNEqdwgX2McIAMj8_3kM8Emj5zxB-owG8AA89FHQSZnyc-O_aGzcPPldocGxhfUb9gecN9ypLjockE6vVJ01aerauBvBEzQ30RBKll83v_2SJDI75tlZPwN1zFzUo3fkvmP0pnTgY9-NwfiqE3C0yru161wxrikw1g"/>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg text-on-surface">Elena is reading...</span>
+<span class="font-mono-timestamp text-mono-timestamp text-secondary">Looking at this memory</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-6">
+<span class="font-label-caps text-label-caps text-on-surface-variant">Toggles</span>
+<div class="flex items-center justify-between p-4 glass-card rounded-xl">
+<span class="font-body-md text-body-md text-on-surface">Location Sharing</span>
+<!-- Custom Toggle based on inputs -->
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- Glass Card Sample -->
+<section class="flex flex-col gap-8">
+<h2 class="font-headline-md text-headline-md border-b border-surface-container-high pb-4">Editorial Cards</h2>
+<div class="glass-card rounded-2xl p-6 md:p-8 flex flex-col gap-6 relative overflow-hidden group">
+<!-- Catchlight simulation top edge -->
+<div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-white/20 via-white/5 to-transparent"></div>
+<div class="flex justify-between items-start">
+<span class="font-mono-timestamp text-mono-timestamp text-primary tracking-widest uppercase">Chapter IV</span>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors cursor-pointer">more_horiz</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">The Winter Solstice</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                    We walked through the snow-covered botanical gardens long after the crowds had left. The air was biting, but the stillness felt entirely ours.
+                </p>
+<div class="h-48 rounded-xl overflow-hidden mt-2">
+<img alt="Winter scene" class="w-full h-full object-cover opacity-80 mix-blend-luminosity hover:mix-blend-normal hover:opacity-100 transition-all duration-700 ease-out" data-alt="A moody, high-contrast black and white photograph of a snow-covered path in a dense forest or botanical garden. Winter mood, stark trees, cinematic editorial framing. Very lonely and intimate feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5T7aqvaSP00JEaAGXMXTywhO1ZDi6ugHjPWvbe2TTjMpbh7JdyG0Wfx-tHQdWVh3i4caAT2jkzfkk-iuaTopP_gR6xQ0q9daXplo9hsKoXxl3SgS1itBVAtYI5MKrffJYypAV_usQenOegO4bLJQV4JgI2NEYnFGGA1PmQMnp_zWl1PEbwMobcBeDkOPtL0LMHfEvYkm-ZCggQc3uEUDECNkxQxg3S-cf4bySjj-ShLUMU2_ttbeS3c4193sT2JKnnjVdRbLfbQ"/>
+</div>
+<p class="font-mono-timestamp text-mono-timestamp text-outline italic mt-4">
+                    Spring physics note: Hover expansion on cards should use a gentle spring (stiffness: 100, damping: 15).
+                </p>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Component (Mobile Context) -->
+<!-- Applying exact styles from JSON execution -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-gutter pb-safe bg-surface-container/80 backdrop-blur-xl bg-surface-container/80 backdrop-blur-24px shadow-[0_-4px_20px_rgba(0,0,0,0.4)] rounded-t-xl h-[80px] md:hidden">
+<!-- Active Tab: settings (Assuming this is a style guide / settings view) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary/80 transition-all" href="#">
+<span class="material-symbols-outlined mb-1">home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary/80 transition-all" href="#">
+<span class="material-symbols-outlined mb-1">chat_bubble</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary/80 transition-all" href="#">
+<span class="material-symbols-outlined mb-1">photo_camera</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary/80 transition-all" href="#">
+<span class="material-symbols-outlined mb-1">call</span>
+</a>
+<!-- Setting 'settings' as active for this demo -->
+<a class="flex flex-col items-center justify-center text-primary drop-shadow-[0_0_8px_rgba(255,178,184,0.6)] scale-110 duration-300 ease-out" href="#">
+<span class="material-symbols-outlined mb-1" data-weight="fill" style="font-variation-settings: 'FILL' 1;">settings</span>
+</a>
+</nav>
+</body></html>

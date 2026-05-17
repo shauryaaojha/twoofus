@@ -1,0 +1,239 @@
+@import "tailwindcss";
+
+/* ===== TwoOfUs Design System (Stitch) ===== */
+@theme inline {
+  /* ----- Color Palette (MD3 Dark) ----- */
+  --color-primary: #ffb2b8;
+  --color-on-primary: #67001e;
+  --color-primary-container: #ff506f;
+  --color-on-primary-container: #5b0019;
+  --color-primary-fixed: #ffdadb;
+  --color-primary-fixed-dim: #ffb2b8;
+
+  --color-secondary: #ffb2bd;
+  --color-on-secondary: #5f1127;
+  --color-secondary-container: #7d283c;
+  --color-on-secondary-container: #ff97a9;
+  --color-secondary-fixed: #ffd9dd;
+  --color-secondary-fixed-dim: #ffb2bd;
+
+  --color-tertiary: #5bde8d;
+  --color-on-tertiary: #00391b;
+  --color-tertiary-container: #04a65c;
+  --color-on-tertiary-container: #003117;
+  --color-tertiary-fixed: #7afca7;
+  --color-tertiary-fixed-dim: #5bde8d;
+
+  --color-error: #ffb4ab;
+  --color-on-error: #690005;
+  --color-error-container: #93000a;
+  --color-on-error-container: #ffdad6;
+
+  --color-surface: #1e0f11;
+  --color-on-surface: #f8dcdd;
+  --color-surface-dim: #1e0f11;
+  --color-surface-bright: #473536;
+  --color-surface-variant: #423031;
+  --color-on-surface-variant: #e2bec0;
+  --color-surface-tint: #ffb2b8;
+  --color-surface-container: #2b1b1d;
+  --color-surface-container-low: #271819;
+  --color-surface-container-high: #362627;
+  --color-surface-container-highest: #423031;
+  --color-surface-container-lowest: #180a0c;
+
+  --color-outline: #a9898b;
+  --color-outline-variant: #5a4042;
+  --color-inverse-surface: #f8dcdd;
+  --color-inverse-on-surface: #3d2c2d;
+  --color-inverse-primary: #ba1340;
+  --color-background: #1e0f11;
+  --color-on-background: #f8dcdd;
+
+  /* ----- Typography ----- */
+  --font-display: 'Bodoni Moda', serif;
+  --font-headline: 'Bodoni Moda', serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-label: 'DM Sans', sans-serif;
+
+  /* ----- Spacing ----- */
+  --spacing-unit: 8px;
+  --spacing-gutter: 24px;
+
+  /* ----- Border Radius ----- */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+  --radius-full: 9999px;
+}
+
+/* ===== Base ===== */
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-on-background);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 24px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== Glass Effects ===== */
+.glass-card {
+  background-color: rgba(22, 22, 22, 0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background-image: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.01) 100%);
+}
+
+.glass-panel {
+  background: rgba(22, 22, 22, 0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+}
+
+/* ===== Presence Glow ===== */
+.presence-glow {
+  box-shadow: 0 0 15px var(--color-secondary);
+  animation: breath 4s infinite ease-in-out;
+}
+
+@keyframes breath {
+  0% { box-shadow: 0 0 10px rgba(255, 178, 189, 0.4); }
+  50% { box-shadow: 0 0 25px rgba(255, 178, 189, 0.8); }
+  100% { box-shadow: 0 0 10px rgba(255, 178, 189, 0.4); }
+}
+
+/* ===== Pulse Rings (Incoming Call) ===== */
+.pulse-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 178, 184, 0.4);
+  animation: pulse-expand 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+.pulse-ring:nth-child(2) { animation-delay: 0.5s; }
+.pulse-ring:nth-child(3) { animation-delay: 1s; }
+
+@keyframes pulse-expand {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+  100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+}
+
+/* ===== Typing Dots ===== */
+@keyframes typing-bounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-6px); }
+}
+.typing-dot {
+  animation: typing-bounce 1.4s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* ===== Float Animation ===== */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+.animate-float { animation: float 2s ease-in-out infinite; }
+
+/* ===== Button Styles ===== */
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: var(--color-on-primary);
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  transition: all 0.2s ease;
+  box-shadow: 0 8px 24px rgba(255, 178, 184, 0.25);
+}
+.btn-primary:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 8px 32px rgba(255, 178, 184, 0.4);
+}
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+/* ===== Custom Scrollbar ===== */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ===== Material Symbols Config ===== */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ===== Minimal Input ===== */
+.minimal-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-surface-variant);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 28px;
+  padding: 8px 0;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+.minimal-input:focus {
+  border-bottom-color: var(--color-primary);
+  box-shadow: 0 1px 0 0 var(--color-primary);
+}
+.minimal-input::placeholder {
+  color: var(--color-outline);
+}
+
+/* ===== Toggle Switch ===== */
+.toggle-track {
+  width: 44px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-surface-variant);
+  position: relative;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+.toggle-track.active {
+  background-color: var(--color-primary);
+}
+.toggle-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.3s ease;
+}
+.toggle-track.active .toggle-thumb {
+  transform: translateX(20px);
+}
+
+/* Toast animation */
+@keyframes slideDown {
+  from { opacity: 0; transform: translate(-50%, -20px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}

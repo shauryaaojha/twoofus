@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TwoOfUs - Invite Your Person</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&amp;family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ffb4ab",
+                        "on-tertiary-container": "#003117",
+                        "inverse-primary": "#ba1340",
+                        "secondary-fixed-dim": "#ffb2bd",
+                        "surface-container-lowest": "#180a0c",
+                        "on-secondary": "#5f1127",
+                        "error-container": "#93000a",
+                        "primary": "#ffb2b8",
+                        "surface-container-high": "#362627",
+                        "surface-bright": "#473536",
+                        "on-primary": "#67001e",
+                        "surface": "#1e0f11",
+                        "on-secondary-fixed-variant": "#7d283c",
+                        "on-secondary-container": "#ff97a9",
+                        "on-surface-variant": "#e2bec0",
+                        "on-tertiary-fixed": "#00210e",
+                        "surface-variant": "#423031",
+                        "primary-fixed": "#ffdadb",
+                        "tertiary-container": "#04a65c",
+                        "on-surface": "#f8dcdd",
+                        "on-primary-container": "#5b0019",
+                        "on-tertiary-fixed-variant": "#00522a",
+                        "on-primary-fixed": "#40000f",
+                        "on-error": "#690005",
+                        "surface-container-low": "#271819",
+                        "tertiary-fixed-dim": "#5bde8d",
+                        "inverse-on-surface": "#3d2c2d",
+                        "secondary-fixed": "#ffd9dd",
+                        "on-primary-fixed-variant": "#91002d",
+                        "surface-container-highest": "#423031",
+                        "on-error-container": "#ffdad6",
+                        "outline-variant": "#5a4042",
+                        "primary-container": "#ff506f",
+                        "surface-container": "#2b1b1d",
+                        "secondary-container": "#7d283c",
+                        "outline": "#a9898b",
+                        "tertiary": "#5bde8d",
+                        "primary-fixed-dim": "#ffb2b8",
+                        "tertiary-fixed": "#7afca7",
+                        "secondary": "#ffb2bd",
+                        "surface-dim": "#1e0f11",
+                        "surface-tint": "#ffb2b8",
+                        "on-tertiary": "#00391b",
+                        "inverse-surface": "#f8dcdd",
+                        "background": "#1e0f11",
+                        "on-background": "#f8dcdd",
+                        "on-secondary-fixed": "#400014"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "120px",
+                        "container-max": "1100px",
+                        "margin-mobile": "20px",
+                        "unit": "8px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["DM Sans"],
+                        "headline-sm": ["Bodoni Moda"],
+                        "display-lg": ["Bodoni Moda"],
+                        "mono-timestamp": ["JetBrains Mono"],
+                        "body-lg": ["DM Sans"],
+                        "body-md": ["DM Sans"],
+                        "label-caps": ["DM Sans"],
+                        "headline-md": ["Bodoni Moda"],
+                        "display-lg-mobile": ["Bodoni Moda"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-sm": ["24px", { "lineHeight": "32px", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "mono-timestamp": ["11px", { "lineHeight": "14px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "headline-md": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["36px", { "lineHeight": "42px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(22, 22, 22, 0.8);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid transparent;
+            border-image: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%) 1;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #ffb2b8 0%, #ffb2bd 100%);
+        }
+        .btn-secondary {
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            box-shadow: inset 0 0 15px rgba(255, 178, 189, 0.2);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+<!-- Ambient Background Glow -->
+<div class="absolute top-1/4 left-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-[100px] pointer-events-none"></div>
+<div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none"></div>
+<main class="w-full max-w-md px-margin-mobile md:px-0 z-10 flex flex-col items-center text-center">
+<header class="mb-12">
+<h1 class="font-display-lg-mobile md:font-display-lg text-on-surface mb-4">Invite your person</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xs mx-auto">
+                Send them this link. Once they join, your private space is created.
+            </p>
+</header>
+<div class="w-full glass-card rounded-xl p-8 mb-8 relative">
+<div class="mb-6">
+<p class="font-mono-timestamp text-mono-timestamp text-on-surface-variant mb-2 uppercase tracking-widest">Secret Invite Link</p>
+<div class="flex items-center justify-between bg-surface-container-low rounded-lg p-4 border border-outline-variant/30">
+<span class="font-mono-timestamp text-body-md text-on-surface blur-sm select-none">twoofus.app/inv/x7k9p2</span>
+<button class="font-label-caps text-label-caps text-primary hover:text-primary-fixed transition-colors">Reveal</button>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<button class="btn-primary rounded-full py-4 px-8 font-body-md text-body-md font-bold text-surface-container-lowest w-full flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">content_copy</span>
+                    Copy Link
+                </button>
+<button class="btn-secondary bg-transparent rounded-full py-4 px-8 font-body-md text-body-md text-on-surface w-full flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">ios_share</span>
+                    Share
+                </button>
+</div>
+</div>
+<div class="flex flex-col items-center gap-4">
+<button class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[18px]">qr_code_2</span>
+                Show QR Code
+            </button>
+<p class="font-mono-timestamp text-mono-timestamp text-outline mt-8">
+                Link expires in 23h 47m
+            </p>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TwoOfUs - Chat</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&amp;family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#ffb4ab",
+                    "on-tertiary-container": "#003117",
+                    "inverse-primary": "#ba1340",
+                    "secondary-fixed-dim": "#ffb2bd",
+                    "surface-container-lowest": "#180a0c",
+                    "on-secondary": "#5f1127",
+                    "error-container": "#93000a",
+                    "primary": "#ffb2b8",
+                    "surface-container-high": "#362627",
+                    "surface-bright": "#473536",
+                    "on-primary": "#67001e",
+                    "surface": "#1e0f11",
+                    "on-secondary-fixed-variant": "#7d283c",
+                    "on-secondary-container": "#ff97a9",
+                    "on-surface-variant": "#e2bec0",
+                    "on-tertiary-fixed": "#00210e",
+                    "surface-variant": "#423031",
+                    "primary-fixed": "#ffdadb",
+                    "tertiary-container": "#04a65c",
+                    "on-surface": "#f8dcdd",
+                    "on-primary-container": "#5b0019",
+                    "on-tertiary-fixed-variant": "#00522a",
+                    "on-primary-fixed": "#40000f",
+                    "on-error": "#690005",
+                    "surface-container-low": "#271819",
+                    "tertiary-fixed-dim": "#5bde8d",
+                    "inverse-on-surface": "#3d2c2d",
+                    "secondary-fixed": "#ffd9dd",
+                    "on-primary-fixed-variant": "#91002d",
+                    "surface-container-highest": "#423031",
+                    "on-error-container": "#ffdad6",
+                    "outline-variant": "#5a4042",
+                    "primary-container": "#ff506f",
+                    "surface-container": "#2b1b1d",
+                    "secondary-container": "#7d283c",
+                    "outline": "#a9898b",
+                    "tertiary": "#5bde8d",
+                    "primary-fixed-dim": "#ffb2b8",
+                    "tertiary-fixed": "#7afca7",
+                    "secondary": "#ffb2bd",
+                    "surface-dim": "#1e0f11",
+                    "surface-tint": "#ffb2b8",
+                    "on-tertiary": "#00391b",
+                    "inverse-surface": "#f8dcdd",
+                    "background": "#1e0f11",
+                    "on-background": "#f8dcdd",
+                    "on-secondary-fixed": "#400014"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "120px",
+                    "container-max": "1100px",
+                    "margin-mobile": "20px",
+                    "unit": "8px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "body-sm": ["DM Sans"],
+                    "headline-sm": ["Bodoni Moda"],
+                    "display-lg": ["Bodoni Moda"],
+                    "mono-timestamp": ["JetBrains Mono"],
+                    "body-lg": ["DM Sans"],
+                    "body-md": ["DM Sans"],
+                    "label-caps": ["DM Sans"],
+                    "headline-md": ["Bodoni Moda"],
+                    "display-lg-mobile": ["Bodoni Moda"]
+            },
+            "fontSize": {
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "mono-timestamp": ["11px", {"lineHeight": "14px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "display-lg-mobile": ["36px", {"lineHeight": "42px", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(22, 22, 22, 0.8);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            border-left: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .presence-glow {
+            box-shadow: 0 0 15px var(--tw-colors-secondary);
+            animation: breath 4s infinite ease-in-out;
+        }
+        @keyframes breath {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 178, 189, 0.4); }
+            50% { box-shadow: 0 0 20px rgba(255, 178, 189, 0.8); }
+        }
+        
+        /* Hide scrollbar for clean editorial look */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile h-16 bg-surface/80 backdrop-blur-[24px] flat no shadows">
+<div class="flex items-center gap-4">
+<div class="relative">
+<img alt="Partner Profile" class="w-10 h-10 rounded-full object-cover border-2 border-surface-container" data-alt="A close-up cinematic portrait of a young woman with soft, natural lighting. The mood is intimate and warm, shot with a shallow depth of field against a dark, minimalist background. The color grading emphasizes deep shadows and soft skin tones, fitting seamlessly into an ultra-dark 'Obsidian' themed digital interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCv6wabUxGOE4RW9mtu07BxtBxo2RKLdgvvgXXPK6ouEY2pZEiMO-sUmrd9CtXxJMlkyvzCIW87JEuKVzef01xJ08sHIisyMlqFLhhWCg2nYpaoj4e-Wg48soGD54mDgbfnAfszrWRo6S4HJzzcOFBBUdfQfiUkjtJQZGdRZv39zmDi4dtaa74DN2QkCZ9UakH63qAHovdJqqOg0ryPr24TWudpA_KiKOVWD-QpcdNwCBDIiFl9mj07hAyIwLNdPw9LXI9IJWDO3w"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-secondary rounded-full border-2 border-surface presence-glow"></div>
+</div>
+<div class="flex flex-col">
+<h1 class="font-headline-sm text-headline-sm text-on-surface tracking-tight">Us</h1>
+</div>
+</div>
+<div class="flex items-center gap-6 text-on-surface-variant">
+<button aria-label="Audio Call" class="hover:text-primary transition-opacity hover:opacity-80 active:scale-95 duration-200">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">call</span>
+</button>
+<button aria-label="Video Call" class="hover:text-primary transition-opacity hover:opacity-80 active:scale-95 duration-200">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">videocam</span>
+</button>
+</div>
+</header>
+<!-- Main Chat Canvas -->
+<main class="flex-1 w-full max-w-container-max mx-auto px-gutter pt-24 pb-32 flex flex-col gap-6 overflow-y-auto">
+<!-- Timestamp -->
+<div class="w-full text-center my-4">
+<span class="font-mono-timestamp text-mono-timestamp text-outline-variant tracking-widest uppercase">Yesterday, 10:42 PM</span>
+</div>
+<!-- Partner Message (Left) -->
+<div class="flex justify-start w-full">
+<div class="glass-panel text-on-surface px-5 py-4 rounded-2xl rounded-tl-sm max-w-[85%] md:max-w-[60%] shadow-lg">
+<p class="font-body-md text-body-md leading-relaxed">I was just thinking about that cafe we found in Kyoto. The one hidden down that narrow alleyway.</p>
+</div>
+</div>
+<!-- My Message (Right) -->
+<div class="flex justify-end w-full">
+<div class="bg-gradient-to-br from-primary-container to-inverse-primary text-white px-5 py-4 rounded-2xl rounded-tr-sm max-w-[85%] md:max-w-[60%] shadow-[0_4px_20px_rgba(186,19,64,0.3)]">
+<p class="font-body-md text-body-md leading-relaxed">With the old jazz records playing? I can still smell the pour-over coffee.</p>
+</div>
+</div>
+<!-- Partner Photo Message (Left) -->
+<div class="flex justify-start w-full mt-4">
+<div class="glass-panel p-2 rounded-2xl rounded-tl-sm max-w-[75%] md:max-w-[40%]">
+<img alt="Shared Memory" class="w-full h-auto rounded-xl object-cover opacity-90" data-alt="A moody, atmospheric photograph of a dimly lit, vintage Japanese cafe interior. Sunlight gently filters through a frosted window, illuminating dust motes and a wooden counter holding a steaming cup of pour-over coffee. The color palette features deep blacks, rich mahogany browns, and warm golden highlights, perfectly matching a cinematic and intimate visual aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9K6rzOayCp9jIz7eIjJD-3IWwQ85UNZV1_MnxAu1P4zClQ66vO-kC6tlNXxhwihztk9LWNh9-CmB-BQQg4q_IDztUi9SKc0bYKFc7c14xwiezmfFPd2veHaJz0Lasw7puQq3OhukWTnUWIHcXkNswGIyikfz8NUBs-tYfC0DwpvvNlXs2KG_mkEklfT3a71aBN39vJ6QvnjX0AB-1aqqxw_GFYGod3dMSe0NgxFxqmF9dHJUtOUPUnUe8zOylB3xxZtQoja8GAw"/>
+<div class="pt-3 pb-1 px-3">
+<p class="font-body-sm text-body-sm text-on-surface-variant italic">Found this in my camera roll.</p>
+</div>
+</div>
+</div>
+<!-- Timestamp -->
+<div class="w-full text-center mt-8 mb-4">
+<span class="font-mono-timestamp text-mono-timestamp text-outline-variant tracking-widest uppercase">Today, 8:15 AM</span>
+</div>
+<!-- My Message (Right) -->
+<div class="flex justify-end w-full">
+<div class="bg-gradient-to-br from-primary-container to-inverse-primary text-white px-5 py-4 rounded-2xl rounded-tr-sm max-w-[85%] md:max-w-[60%] shadow-[0_4px_20px_rgba(186,19,64,0.3)]">
+<p class="font-body-md text-body-md leading-relaxed">We need to go back. Soon.</p>
+</div>
+</div>
+<!-- Partner Typing Indicator (Left) -->
+<div class="flex justify-start w-full mt-2">
+<div class="glass-panel px-4 py-3 rounded-full flex items-center gap-1.5 opacity-70">
+<div class="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-bounce" style="animation-delay: 0s;"></div>
+<div class="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-bounce" style="animation-delay: 0.2s;"></div>
+<div class="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-bounce" style="animation-delay: 0.4s;"></div>
+</div>
+</div>
+</main>
+<!-- Bottom Input Bar -->
+<footer class="fixed bottom-0 left-0 w-full glass-panel border-t border-outline-variant/10 px-gutter py-4 pb-[max(1rem,env(safe-area-inset-bottom))] z-50">
+<div class="max-w-container-max mx-auto flex items-end gap-4">
+<button aria-label="Add Photo" class="p-2 text-outline hover:text-primary transition-colors mb-1">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'wght' 300;">photo_camera</span>
+</button>
+<div class="flex-1 relative mb-1">
+<textarea class="w-full bg-transparent border-0 border-b border-outline-variant/50 px-0 py-2 text-on-surface font-body-md text-body-md focus:ring-0 focus:border-primary placeholder:text-outline resize-none overflow-hidden transition-colors" placeholder="Say something sweet..." rows="1"></textarea>
+</div>
+<button aria-label="Send Message" class="w-12 h-12 rounded-full bg-gradient-to-br from-primary-container to-inverse-primary flex items-center justify-center text-white shadow-lg hover:opacity-90 active:scale-95 transition-all shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'wght' 400;">send</span>
+</button>
+</div>
+</footer>
+</body></html>
