@@ -24,10 +24,16 @@ export default function AcceptInvitePage() {
         return;
       }
 
-      // Check session keys exist
-      if (!hasSessionKeys()) {
+      // Check if user has keys set up in their database profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('encrypted_private_key')
+        .eq('id', user.id)
+        .single();
+
+      if (!profile?.encrypted_private_key || !hasSessionKeys()) {
         sessionStorage.setItem('invite_token', token);
-        router.push('/login');
+        router.push('/unlock');
         return;
       }
 

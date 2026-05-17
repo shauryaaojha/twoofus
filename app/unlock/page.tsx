@@ -67,8 +67,14 @@ export default function UnlockPage() {
         }
       }
       
-      router.push('/home');
-      router.refresh();
+      const inviteToken = sessionStorage.getItem('invite_token');
+      if (inviteToken) {
+        sessionStorage.removeItem('invite_token');
+        router.push(`/invite/${inviteToken}`);
+      } else {
+        router.push('/home');
+        router.refresh();
+      }
     } catch (err) {
       setError('An error occurred. Please try again.');
       setLoading(false);

@@ -26,6 +26,18 @@ export default function PairPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push('/login'); return; }
 
+      // Check if user has keys set up in their database profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('encrypted_private_key')
+        .eq('id', user.id)
+        .single();
+
+      if (!profile?.encrypted_private_key || !hasSessionKeys()) {
+        router.push('/unlock');
+        return;
+      }
+
       // Check if already in an active couple
       const { data: active } = await supabase
         .from('couples').select('*')
