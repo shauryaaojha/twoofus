@@ -17,6 +17,7 @@ export default function PairPage() {
   const [password, setPassword] = useState('');
   const [needsPassword, setNeedsPassword] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [joinToken, setJoinToken] = useState('');
   const router = useRouter();
   const toast = useToastStore();
 
@@ -135,6 +136,18 @@ export default function PairPage() {
     }
   };
 
+  const handleJoin = () => {
+    let token = joinToken.trim();
+    if (token.includes('/invite/')) {
+      token = token.split('/invite/')[1].split('/')[0].split('?')[0];
+    }
+    if (token) {
+      router.push(`/invite/${token}`);
+    } else {
+      toast.show('Invalid invite code', 'error');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -185,6 +198,30 @@ export default function PairPage() {
               <span className="material-symbols-outlined">link</span>
               {creating ? 'Setting up...' : 'Generate Invite Link'}
             </button>
+
+            <div className="relative flex items-center py-2">
+              <div className="flex-grow border-t border-outline/20"></div>
+              <span className="flex-shrink-0 mx-4 text-xs font-mono text-outline uppercase tracking-widest">or connect</span>
+              <div className="flex-grow border-t border-outline/20"></div>
+            </div>
+
+            <div className="flex flex-col gap-3 text-left">
+              <input
+                type="text"
+                value={joinToken}
+                onChange={(e) => setJoinToken(e.target.value)}
+                placeholder="Paste invite link or code..."
+                className="minimal-input w-full"
+              />
+              <button 
+                onClick={handleJoin}
+                disabled={!joinToken}
+                className="btn-secondary py-4 px-8 text-base w-full flex items-center justify-center gap-2 disabled:opacity-50 border border-outline/20 text-on-surface hover:bg-surface-variant/30 transition-colors rounded-2xl"
+              >
+                <span className="material-symbols-outlined">group_add</span>
+                Connect
+              </button>
+            </div>
           </div>
         ) : (
           <div className="glass-card rounded-2xl p-8">
