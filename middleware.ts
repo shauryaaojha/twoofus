@@ -23,8 +23,10 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // Refresh session
-  const { data: { user } } = await supabase.auth.getUser();
+  // Use getSession instead of getUser in middleware for faster edge execution
+  // and to avoid local Windows Edge runtime fetch issues.
+  const { data: { session } } = await supabase.auth.getSession();
+  const user = session?.user;
 
   // Protect app routes
   const isAppRoute = request.nextUrl.pathname.startsWith('/home') ||
@@ -36,7 +38,12 @@ export async function middleware(request: NextRequest) {
   if (isAppRoute && !user) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
-    return NextResponse.redirect(url);
+    const redirectRes = NextResponse.redirect(url);
+    // Copy cookies from supabaseResponse to the redirect response
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      redirectRes.cookies.set(cookie.name, cookie.value, cookie);
+    });
+    return redirectRes;
   }
 
   // Redirect logged-in users away from auth pages
@@ -44,7 +51,12 @@ export async function middleware(request: NextRequest) {
   if (isAuthRoute && user) {
     const url = request.nextUrl.clone();
     url.pathname = '/home';
-    return NextResponse.redirect(url);
+    const redirectRes = NextResponse.redirect(url);
+    // Copy cookies
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      redirectRes.cookies.set(cookie.name, cookie.value, cookie);
+    });
+    return redirectRes;
   }
 
   return supabaseResponse;
