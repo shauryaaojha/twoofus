@@ -1,6 +1,22 @@
 import SimplePeer from 'simple-peer';
 import { getSupabase } from '@/lib/supabase/client';
 
+const ICE_CONFIG = {
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:global.stun.twilio.com:3478' },
+    {
+      urls: [
+        'turn:staticauth.openrelay.metered.ca:80',
+        'turn:staticauth.openrelay.metered.ca:443',
+        'turn:staticauth.openrelay.metered.ca:443?transport=tcp'
+      ],
+      username: 'openrelayproject',
+      credential: 'openrelayprojectsecret'
+    }
+  ]
+};
+
 export class CallManager {
   private peer: SimplePeer.Instance | null = null;
   private coupleId: string;
@@ -12,12 +28,22 @@ export class CallManager {
   }
 
   async startCall(localStream: MediaStream, onRemoteStream: (s: MediaStream) => void) {
-    this.peer = new SimplePeer({ initiator: true, stream: localStream, trickle: true });
+    this.peer = new SimplePeer({
+      initiator: true,
+      stream: localStream,
+      trickle: true,
+      config: ICE_CONFIG
+    });
     this.setupPeer(onRemoteStream);
   }
 
   async answerCall(localStream: MediaStream, offer: SimplePeer.SignalData, onRemoteStream: (s: MediaStream) => void) {
-    this.peer = new SimplePeer({ initiator: false, stream: localStream, trickle: true });
+    this.peer = new SimplePeer({
+      initiator: false,
+      stream: localStream,
+      trickle: true,
+      config: ICE_CONFIG
+    });
     this.setupPeer(onRemoteStream);
     this.peer.signal(offer);
   }

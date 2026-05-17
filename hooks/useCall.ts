@@ -23,6 +23,7 @@ const generateUUID = () => {
 
 const instanceId = generateUUID();
 const processedSignalIds = new Set<string>();
+const signalQueue: SimplePeer.SignalData[] = [];
 
 export function useCall() {
   const { user, couple } = useAuthStore();
@@ -45,6 +46,9 @@ export function useCall() {
   const resetCallState = useCallStore((s) => s.resetCallState);
 
   const cleanup = useCallback(() => {
+    // Clear the early signal queue
+    signalQueue.length = 0;
+    
     const { localStream: currentLocal, remoteStream: currentRemote } = useCallStore.getState();
     currentLocal?.getTracks().forEach((t) => t.stop());
     currentRemote?.getTracks().forEach((t) => t.stop());
@@ -105,6 +109,14 @@ export function useCall() {
       setCallError('Failed to establish peer connection.');
       return;
     }
+
+    // Flush any early queued signals (e.g. answers or early candidates)
+    while (signalQueue.length > 0) {
+      const qSignal = signalQueue.shift();
+      if (qSignal) {
+        manager.signal(qSignal);
+      }
+    }
     
     if (activeTimer) clearInterval(activeTimer);
     activeTimer = setInterval(() => {
@@ -161,6 +173,14 @@ export function useCall() {
       setLocalStream(null);
       setCallError('Failed to establish peer connection.');
       return;
+    }
+
+    // Flush early candidates that arrived before the call was officially answered
+    while (signalQueue.length > 0) {
+      const qSignal = signalQueue.shift();
+      if (qSignal) {
+        manager.signal(qSignal);
+      }
     }
     
     if (activeTimer) clearInterval(activeTimer);
@@ -222,7 +242,11 @@ export function useCall() {
               }
             }, 60000);
           } else if (signal.type === 'answer' || signal.type === 'ice') {
-            activeManager?.signal(signal.payload as unknown as SimplePeer.SignalData);
+            if (activeManager) {
+              activeManager.signal(signal.payload as unknown as SimplePeer.SignalData);
+            } else {
+              signalQueue.push(signal.payload as unknown as SimplePeer.SignalData);
+            }
           } else if (signal.type === 'end' || signal.type === 'reject') {
             cleanup();
           }
