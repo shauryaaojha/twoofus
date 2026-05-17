@@ -16,7 +16,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { setUser, setProfile, setCouple, setPartner, setLoading, isLoading, reset } = useAuthStore();
   const [initialized, setInitialized] = useState(false);
   const router = useRouter();
-  const { incomingCall, answerCall, setIncomingCall } = useCall();
+  const { incomingCall, answerCall, declineCall } = useCall();
   const partner = useAuthStore((s) => s.partner);
 
   useEffect(() => {
@@ -103,8 +103,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <IncomingCallModal
           callerName={partner.display_name || 'Partner'}
           callerAvatar={partner.avatar_url}
-          onAccept={() => answerCall(incomingCall)}
-          onDecline={() => setIncomingCall(null)}
+          onAccept={() => {
+            answerCall(incomingCall);
+            router.push('/call');
+          }}
+          onDecline={declineCall}
         />
       )}
     </>

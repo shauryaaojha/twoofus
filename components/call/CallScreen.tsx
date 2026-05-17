@@ -41,17 +41,32 @@ export default function CallScreen({
     }
   }, [localStream]);
 
+  // Determine if streams have active video tracks (not muted / disabled)
+  const hasRemoteVideo = !!(remoteStream && remoteStream.getVideoTracks().length > 0 && remoteStream.getVideoTracks().some(t => t.enabled));
+  const hasLocalVideo = !!(localStream && localStream.getVideoTracks().length > 0 && localStream.getVideoTracks().some(t => t.enabled));
+
   return (
     <div className="fixed inset-0 z-50 bg-background flex items-center justify-center">
-      {/* Remote video bg */}
+      {/* Remote video/audio stream container */}
       <div className="absolute inset-0 z-0">
-        {remoteStream ? (
-          <video ref={remoteVideoRef} autoPlay playsInline className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full bg-surface-container flex items-center justify-center">
-            <div className="w-24 h-24 rounded-full bg-primary-container flex items-center justify-center">
-              <span className="text-4xl">{partnerName[0]}</span>
+        {remoteStream && (
+          <video
+            ref={remoteVideoRef}
+            autoPlay
+            playsInline
+            className={`w-full h-full object-cover ${hasRemoteVideo ? 'block' : 'hidden'}`}
+          />
+        )}
+        
+        {(!remoteStream || !hasRemoteVideo) && (
+          <div className="w-full h-full bg-surface-container flex flex-col items-center justify-center gap-4">
+            <div className="w-32 h-32 rounded-full bg-primary-container/30 border border-primary/20 flex items-center justify-center shadow-[0_0_40px_rgba(255,178,184,0.15)] relative">
+              <div className="absolute inset-0 rounded-full border-2 border-primary/10 animate-ping opacity-25" style={{ animationDuration: '3s' }} />
+              <span className="text-5xl text-primary font-bold">{partnerName[0]}</span>
             </div>
+            <p className="text-on-surface-variant text-base mt-2">
+              {!remoteStream ? 'Connecting...' : 'Voice call ongoing'}
+            </p>
           </div>
         )}
       </div>
@@ -74,12 +89,21 @@ export default function CallScreen({
           </div>
 
           {/* Self PiP */}
-          <div className="ml-auto w-[100px] h-[140px] md:w-[140px] md:h-[200px] rounded-[16px] overflow-hidden border-[1.5px] border-outline/40 shadow-[0_8px_32px_rgba(0,0,0,0.6)] bg-surface relative">
-            {localStream ? (
-              <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover" style={{ transform: 'scaleX(-1)' }} />
-            ) : (
+          <div className="ml-auto w-[100px] h-[140px] md:w-[140px] md:h-[200px] rounded-[16px] overflow-hidden border-[1.5px] border-outline/40 shadow-[0_8px_32px_rgba(0,0,0,0.6)] bg-surface relative animate-fade-in">
+            {localStream && (
+              <video
+                ref={localVideoRef}
+                autoPlay
+                playsInline
+                muted
+                className={`w-full h-full object-cover ${hasLocalVideo ? 'block' : 'hidden'}`}
+                style={{ transform: 'scaleX(-1)' }}
+              />
+            )}
+            
+            {(!localStream || !hasLocalVideo) && (
               <div className="w-full h-full bg-surface-container flex items-center justify-center">
-                <span className="material-symbols-outlined text-on-surface-variant">person</span>
+                <span className="material-symbols-outlined text-[36px] text-on-surface-variant">person</span>
               </div>
             )}
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none rounded-[16px]" />
