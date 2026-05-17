@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSupabase } from '@/lib/supabase/client';
-import { fetchAndDecryptKeys, generateAndUploadKeys, hasSessionKeys } from '@/lib/crypto/keyManager';
+import { clearAllKeys, fetchAndDecryptKeys, generateAndUploadKeys, hasSessionKeys } from '@/lib/crypto/keyManager';
 import { useAuthStore } from '@/lib/store/authStore';
 
 const OTPInput = ({ value, onChange, disabled, autoFocus }: { value: string, onChange: (val: string) => void, disabled?: boolean, autoFocus?: boolean }) => {
@@ -90,13 +90,10 @@ export default function UnlockPage() {
 
   useEffect(() => {
     const checkState = async () => {
-      if (hasSessionKeys()) {
-        router.push('/home');
-        return;
-      }
       const supabase = getSupabase();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
+        clearAllKeys();
         router.push('/login');
         return;
       }
@@ -106,10 +103,23 @@ export default function UnlockPage() {
         .from('profiles')
         .select('encrypted_private_key')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
+
+      if (!profile) {
+        clearAllKeys();
+        await supabase.auth.signOut({ scope: 'local' }).catch(() => undefined);
+        router.push('/login?reason=session-reset');
+        return;
+      }
         
       if (!profile?.encrypted_private_key) {
+        clearAllKeys();
         setMode('setup');
+        return;
+      }
+
+      if (hasSessionKeys()) {
+        router.push('/home');
       }
     };
     checkState();
@@ -170,25 +180,12 @@ export default function UnlockPage() {
         router.push('/home');
         router.refresh();
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred. Please try again.');
       setLoading(false);
       setStatus('');
     }
   };
-
-  // Auto-submit effects
-  useEffect(() => {
-    if (mode === 'unlock' && pin.length === 6) {
-      handleSubmit();
-    } else if (mode === 'setup' && step === 'enter' && pin.length === 6) {
-      setStep('confirm');
-      setError('');
-    } else if (mode === 'setup' && step === 'confirm' && confirmPin.length === 6) {
-      handleSubmit();
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pin, confirmPin, mode, step]);
 
   return (
     <div className="min-h-screen w-full flex flex-col justify-center items-center p-6 sm:p-8 bg-background text-on-background relative overflow-hidden">

@@ -1,6 +1,7 @@
 'use client';
 
 import { getSupabase } from '@/lib/supabase/client';
+import { clearAllKeys } from '@/lib/crypto/keyManager';
 import { useState } from 'react';
 
 export default function OAuthButtons() {
@@ -10,6 +11,7 @@ export default function OAuthButtons() {
   const handleGoogleLogin = async () => {
     setLoading(true);
     setError('');
+    clearAllKeys();
     const supabase = getSupabase();
     const appOrigin = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
     

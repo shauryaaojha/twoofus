@@ -1,0 +1,10 @@
+BEGIN;
+  DELETE FROM public.messages;
+  DELETE FROM public.photos;
+  DELETE FROM public.call_signals;
+  DELETE FROM public.photo_quota;
+  DELETE FROM public.push_subscriptions;
+  DELETE FROM public.couples;
+  DELETE FROM public.profiles;
+  DELETE FROM auth.users;
+COMMIT;

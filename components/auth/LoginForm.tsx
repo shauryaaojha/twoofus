@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getSupabase } from '@/lib/supabase/client';
-import { fetchAndDecryptKeys, generateAndUploadKeys } from '@/lib/crypto/keyManager';
+import { clearAllKeys } from '@/lib/crypto/keyManager';
 import Link from 'next/link';
 import OAuthButtons from './OAuthButtons';
 
@@ -21,11 +21,12 @@ export default function LoginForm() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    const supabase = getSupabase();
-
-    // 1. Authenticate
     setStatus('Signing in...');
+
+    clearAllKeys();
+    const supabase = getSupabase();
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
+
     if (authError) {
       setError(authError.message);
       setLoading(false);
@@ -33,26 +34,46 @@ export default function LoginForm() {
       return;
     }
 
-    const userId = authData.user?.id;
-    if (!userId) { setError('Login failed'); setLoading(false); return; }
+    if (!authData.user?.id) {
+      setError('Login failed');
+      setLoading(false);
+      setStatus('');
+      return;
+    }
 
-    // 2. Fetch and decrypt E2EE private key using password
-    setStatus('Restoring encryption keys...');
-    const restored = await fetchAndDecryptKeys(supabase, userId, password);
+    const userId = authData.user.id;
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', userId)
+      .maybeSingle();
 
-    if (!restored) {
-      // Legacy account or first device — generate and upload keys
-      setStatus('Setting up encryption...');
-      try {
-        await generateAndUploadKeys(supabase, userId, password);
-      } catch {
-        setError('Failed to set up encryption.');
+    if (!profile) {
+      const metadata = authData.user.user_metadata ?? {};
+      const displayName =
+        metadata.display_name ||
+        metadata.full_name ||
+        metadata.name ||
+        authData.user.email?.split('@')[0] ||
+        'You';
+
+      const { error: profileError } = await supabase.from('profiles').insert({
+        id: userId,
+        display_name: displayName,
+        avatar_url: metadata.avatar_url || metadata.picture || null,
+        mood: '🥰',
+      });
+
+      if (profileError) {
+        setError('Signed in, but profile setup failed. Please try again.');
         setLoading(false);
+        setStatus('');
         return;
       }
     }
 
-    router.push('/home');
+    setStatus('Opening PIN setup...');
+    router.push('/unlock');
     router.refresh();
   };
 
@@ -72,18 +93,29 @@ export default function LoginForm() {
         <label className="text-xs font-bold tracking-widest uppercase text-on-surface-variant" style={{ fontFamily: 'var(--font-label)' }}>
           Email
         </label>
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-          className="minimal-input" placeholder="you@example.com" required />
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="minimal-input"
+          placeholder="you@example.com"
+          required
+        />
       </div>
       <div className="flex flex-col gap-1">
         <label className="text-xs font-bold tracking-widest uppercase text-on-surface-variant" style={{ fontFamily: 'var(--font-label)' }}>
           Password
         </label>
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-          className="minimal-input" placeholder="••••••••" required />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="minimal-input"
+          placeholder="Password"
+          required
+        />
       </div>
-      <button type="submit" disabled={loading}
-        className="btn-primary py-4 px-8 text-base w-full mt-4 disabled:opacity-50">
+      <button type="submit" disabled={loading} className="btn-primary py-4 px-8 text-base w-full mt-4 disabled:opacity-50">
         {loading ? status || 'Signing in...' : 'Sign In'}
       </button>
 
@@ -92,7 +124,7 @@ export default function LoginForm() {
         <span className="text-xs text-on-surface-variant uppercase tracking-widest font-bold">Or</span>
         <div className="flex-1 h-px bg-outline/20"></div>
       </div>
-      
+
       <OAuthButtons />
 
       <p className="text-center text-sm text-on-surface-variant">
