@@ -38,16 +38,19 @@ export function useRealtimeMessages() {
   const fetchMessages = useCallback(async () => {
     if (!couple?.id) return;
     const supabase = getSupabase();
+    // Fetch the LATEST 200 messages (order desc to get newest, then reverse for display)
     const { data } = await supabase
       .from('messages')
       .select('*')
       .eq('couple_id', couple.id)
       .is('deleted_at', null)
-      .order('created_at', { ascending: true })
+      .order('created_at', { ascending: false })
       .limit(200);
 
     if (data) {
-      setMessages(data.map(decryptMsg));
+      // Reverse so messages display oldest-first (chronological order)
+      const chronological = data.reverse();
+      setMessages(chronological.map(decryptMsg));
       // Mark partner messages as seen only if tab is currently visible
       if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
         markAsSeen();
