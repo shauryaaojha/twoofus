@@ -33,6 +33,7 @@ export async function proxy(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/chat') ||
     request.nextUrl.pathname.startsWith('/call') ||
     request.nextUrl.pathname.startsWith('/settings') ||
+    request.nextUrl.pathname.startsWith('/profile') ||
     request.nextUrl.pathname.startsWith('/pair');
 
   if (isAppRoute && !user) {

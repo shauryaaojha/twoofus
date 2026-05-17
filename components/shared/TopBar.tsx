@@ -1,10 +1,22 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/authStore';
+import { getSupabase } from '@/lib/supabase/client';
+import { clearAllKeys } from '@/lib/crypto/keyManager';
 
 export default function TopBar() {
-  const { partner } = useAuthStore();
+  const { partner, reset } = useAuthStore();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const supabase = getSupabase();
+    await supabase.auth.signOut();
+    clearAllKeys();
+    reset();
+    router.push('/login');
+  };
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-5 h-16 bg-surface/80 backdrop-blur-xl md:px-[120px]">
@@ -27,9 +39,23 @@ export default function TopBar() {
         </h1>
       </div>
       <div className="flex items-center gap-3">
-        <Link href="/call" className="text-primary hover:text-primary-fixed transition-colors">
+        <Link href="/call" aria-label="Start call" className="text-primary hover:text-primary-fixed transition-colors">
           <span className="material-symbols-outlined">videocam</span>
         </Link>
+        <Link href="/profile" aria-label="View profile" className="text-on-surface-variant hover:text-primary transition-colors">
+          <span className="material-symbols-outlined">account_circle</span>
+        </Link>
+        <Link href="/settings" aria-label="Open settings" className="text-on-surface-variant hover:text-primary transition-colors">
+          <span className="material-symbols-outlined">settings</span>
+        </Link>
+        <button
+          type="button"
+          onClick={handleLogout}
+          aria-label="Log out"
+          className="text-on-surface-variant hover:text-error transition-colors"
+        >
+          <span className="material-symbols-outlined">logout</span>
+        </button>
       </div>
     </header>
   );

@@ -8,7 +8,9 @@ import { exportPrivateKey, importPrivateKey, clearAllKeys } from '@/lib/crypto/k
 import { useToastStore } from '@/lib/store/toastStore';
 
 export default function SettingsPage() {
-  const { profile, couple, user, reset } = useAuthStore();
+  const { profile, couple, user, reset, setProfile } = useAuthStore();
+  const [displayName, setDisplayName] = useState(profile?.display_name || '');
+  const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || '');
   const [anniversary, setAnniversary] = useState(couple?.anniversary_date || '');
   const [songUrl, setSongUrl] = useState(couple?.our_song_url || '');
   const [notifMoments, setNotifMoments] = useState(true);
@@ -17,6 +19,40 @@ export default function SettingsPage() {
   const [ending, setEnding] = useState(false);
   const router = useRouter();
   const toast = useToastStore();
+
+  const saveProfile = async () => {
+    if (!user?.id) return;
+    const nextDisplayName = displayName.trim();
+    if (!nextDisplayName) {
+      toast.show('Name cannot be empty', 'error');
+      setDisplayName(profile?.display_name || '');
+      return;
+    }
+
+    const nextAvatarUrl = avatarUrl.trim() || null;
+    const supabase = getSupabase();
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        display_name: nextDisplayName,
+        avatar_url: nextAvatarUrl,
+      })
+      .eq('id', user.id);
+
+    if (error) {
+      toast.show('Could not save profile', 'error');
+      return;
+    }
+
+    if (profile) {
+      setProfile({
+        ...profile,
+        display_name: nextDisplayName,
+        avatar_url: nextAvatarUrl,
+      });
+    }
+    toast.show('Profile saved', 'success');
+  };
 
   const saveSettings = async () => {
     if (!couple?.id) return;
@@ -101,6 +137,35 @@ export default function SettingsPage() {
         <p className="text-base text-on-surface-variant mt-2" style={{ fontFamily: 'var(--font-body)' }}>
           {user?.email}
         </p>
+      </section>
+
+      {/* Account */}
+      <section className="glass-card rounded-xl p-6 flex flex-col gap-6">
+        <h3 className="text-2xl font-medium text-on-surface border-b border-surface-variant pb-2" style={{ fontFamily: 'var(--font-headline)' }}>Account</h3>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col">
+            <label className="text-xs font-bold tracking-[0.1em] uppercase text-on-surface-variant mb-1" style={{ fontFamily: 'var(--font-label)' }}>Display Name</label>
+            <input
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              onBlur={saveProfile}
+              className="minimal-input"
+              placeholder="Your name"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-xs font-bold tracking-[0.1em] uppercase text-on-surface-variant mb-1" style={{ fontFamily: 'var(--font-label)' }}>Avatar URL</label>
+            <input
+              type="url"
+              value={avatarUrl}
+              onChange={(e) => setAvatarUrl(e.target.value)}
+              onBlur={saveProfile}
+              className="minimal-input"
+              placeholder="https://..."
+            />
+          </div>
+        </div>
       </section>
 
       {/* Invite / Unpaired State */}

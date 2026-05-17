@@ -7,6 +7,7 @@ const navItems = [
   { href: '/home', icon: 'home', label: 'Home' },
   { href: '/chat', icon: 'chat_bubble', label: 'Chat' },
   { href: '/call', icon: 'call', label: 'Call' },
+  { href: '/profile', icon: 'person', label: 'Profile' },
   { href: '/settings', icon: 'settings', label: 'Settings' },
 ];
 
@@ -33,6 +34,7 @@ export default function BottomNav() {
             >
               {item.icon}
             </span>
+            <span className="sr-only">{item.label}</span>
           </Link>
         );
       })}
