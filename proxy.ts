@@ -36,6 +36,38 @@ export async function proxy(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/profile') ||
     request.nextUrl.pathname.startsWith('/pair');
 
+  // If public DB rows were reset while the auth cookie still exists, the app can
+  // otherwise keep bouncing away from /login. Treat missing profile as stale auth.
+  const isAuthRoute = request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup';
+  if (user && (isAppRoute || isAuthRoute)) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (!profile) {
+      await supabase.auth.signOut({ scope: 'local' });
+      const url = request.nextUrl.clone();
+      url.pathname = '/login';
+      url.searchParams.set('reason', 'session-reset');
+
+      if (isAuthRoute) {
+        const nextRes = NextResponse.next({ request });
+        supabaseResponse.cookies.getAll().forEach((cookie) => {
+          nextRes.cookies.set(cookie.name, cookie.value, cookie);
+        });
+        return nextRes;
+      }
+
+      const redirectRes = NextResponse.redirect(url);
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        redirectRes.cookies.set(cookie.name, cookie.value, cookie);
+      });
+      return redirectRes;
+    }
+  }
+
   if (isAppRoute && !user) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
@@ -48,7 +80,6 @@ export async function proxy(request: NextRequest) {
   }
 
   // Redirect logged-in users away from auth pages
-  const isAuthRoute = request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup';
   if (isAuthRoute && user) {
     const url = request.nextUrl.clone();
     url.pathname = '/home';

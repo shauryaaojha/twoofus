@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { getSupabase } from '@/lib/supabase/client';
 import { fetchAndDecryptKeys, generateAndUploadKeys } from '@/lib/crypto/keyManager';
 import Link from 'next/link';
@@ -14,6 +14,8 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState('');
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const sessionWasReset = searchParams.get('reason') === 'session-reset';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,6 +61,11 @@ export default function LoginForm() {
       {error && (
         <div className="text-error text-sm p-3 rounded-lg bg-error-container/20 border border-error/20">
           {error}
+        </div>
+      )}
+      {sessionWasReset && !error && (
+        <div className="text-tertiary text-sm p-3 rounded-lg bg-tertiary-container/20 border border-tertiary/20">
+          Session reset after database cleanup. Please sign in again.
         </div>
       )}
       <div className="flex flex-col gap-1">

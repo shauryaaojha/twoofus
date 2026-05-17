@@ -1,4 +1,5 @@
 import LoginForm from '@/components/auth/LoginForm';
+import { Suspense } from 'react';
 
 export default function LoginPage() {
   return (
@@ -24,7 +25,9 @@ export default function LoginPage() {
 
         {/* Glass card */}
         <div className="glass-card rounded-2xl p-8">
-          <LoginForm />
+          <Suspense>
+            <LoginForm />
+          </Suspense>
         </div>
       </div>
     </main>

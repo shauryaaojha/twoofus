@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSupabase } from '@/lib/supabase/client';
 import { useAuthStore } from '@/lib/store/authStore';
-import { hasSessionKeys } from '@/lib/crypto/keyManager';
+import { clearAllKeys, hasSessionKeys } from '@/lib/crypto/keyManager';
 import TopBar from '@/components/shared/TopBar';
 import BottomNav from '@/components/shared/BottomNav';
 import LoadingScreen from '@/components/shared/LoadingScreen';
@@ -13,7 +13,7 @@ import Toast from '@/components/shared/Toast';
 import { useCall } from '@/hooks/useCall';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { setUser, setProfile, setCouple, setPartner, setLoading, isLoading } = useAuthStore();
+  const { setUser, setProfile, setCouple, setPartner, setLoading, isLoading, reset } = useAuthStore();
   const [initialized, setInitialized] = useState(false);
   const router = useRouter();
   const { incomingCall, answerCall, setIncomingCall } = useCall();
@@ -23,9 +23,22 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     const init = async () => {
       setLoading(true);
       const supabase = getSupabase();
+      const resetStaleSession = async () => {
+        await supabase.auth.signOut({ scope: 'local' }).catch(() => undefined);
+        clearAllKeys();
+        reset();
+        setLoading(false);
+        setInitialized(true);
+        setTimeout(() => router.replace('/login?reason=session-reset'), 0);
+      };
+
       const { data: { user: authUser } } = await supabase.auth.getUser();
 
       if (!authUser) { 
+        clearAllKeys();
+        reset();
+        setLoading(false);
+        setInitialized(true);
         setTimeout(() => router.push('/login'), 0); 
         return; 
       }
@@ -41,8 +54,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       // Fetch profile
       const { data: profile } = await supabase
-        .from('profiles').select('*').eq('id', authUser.id).single();
-      if (profile) setProfile(profile);
+        .from('profiles').select('*').eq('id', authUser.id).maybeSingle();
+      if (!profile) {
+        await resetStaleSession();
+        return;
+      }
+      setProfile(profile);
 
       // Fetch couple (can be active or pending)
       const { data: couple } = await supabase
@@ -72,7 +89,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       setInitialized(true);
     };
     init();
-  }, [router, setUser, setProfile, setCouple, setPartner, setLoading]);
+  }, [router, setUser, setProfile, setCouple, setPartner, setLoading, reset]);
 
   if (isLoading || !initialized) return <LoadingScreen />;
 
