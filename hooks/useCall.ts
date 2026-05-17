@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { getSupabase } from '@/lib/supabase/client';
 import { useAuthStore } from '@/lib/store/authStore';
 import { useCallStore } from '@/lib/store/callStore';
@@ -26,6 +26,7 @@ const processedSignalIds = new Set<string>();
 
 export function useCall() {
   const { user, couple } = useAuthStore();
+  const hookId = useRef(Math.random().toString(36).substring(2));
   
   // Reactively bind to the Zustand call store
   const incomingCall = useCallStore((s) => s.incomingCall);
@@ -193,7 +194,7 @@ export function useCall() {
     const supabase = getSupabase();
     
     const channel = supabase
-      .channel(`call_signals:${couple.id}:${user.id}:${instanceId}`)
+      .channel(`call_signals:${couple.id}:${user.id}:${instanceId}:${hookId.current}`)
       .on('postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'call_signals', filter: `couple_id=eq.${couple.id}` },
         (payload) => {
