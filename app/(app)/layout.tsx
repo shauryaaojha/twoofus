@@ -25,14 +25,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       const supabase = getSupabase();
       const { data: { user: authUser } } = await supabase.auth.getUser();
 
-      if (!authUser) { router.push('/login'); return; }
+      if (!authUser) { 
+        setTimeout(() => router.push('/login'), 0); 
+        return; 
+      }
 
       setUser({ id: authUser.id, email: authUser.email || '' });
 
       // Check if keys exist in session cache (set during login)
       if (!hasSessionKeys()) {
         // No keys in session — user needs to unlock keys via PIN/Password
-        router.push('/unlock');
+        setTimeout(() => router.push('/unlock'), 0);
         return;
       }
 
