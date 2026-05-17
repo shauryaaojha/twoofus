@@ -6,20 +6,7 @@ export default async function SplashPage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (user) {
-    // Check if paired
-    const { data: couple } = await supabase
-      .from('couples')
-      .select('*')
-      .or(`user_a.eq.${user.id},user_b.eq.${user.id}`)
-      .not('user_b', 'is', null)
-      .eq('status', 'active')
-      .single();
-
-    if (couple) {
-      redirect('/home');
-    } else {
-      redirect('/pair');
-    }
+    redirect('/home');
   }
 
   return (

@@ -17,7 +17,7 @@ export default function HomePage() {
       {/* Hero section */}
       <section className="flex flex-col items-center text-center pt-12 pb-8">
         {/* Partner info */}
-        {partner && (
+        {partner ? (
           <div className="flex items-center gap-3 mb-8">
             <div className="relative">
               {partner.avatar_url ? (
@@ -41,9 +41,30 @@ export default function HomePage() {
               </p>
             </div>
           </div>
+        ) : (
+          <div className="flex flex-col items-center mb-8 bg-surface-container-low p-6 rounded-2xl w-full max-w-sm border border-outline-variant/30">
+            <span className="material-symbols-outlined text-[48px] text-tertiary mb-3 block">diversity_1</span>
+            {couple ? (
+              <>
+                <h2 className="text-xl text-on-surface mb-2 font-medium">Waiting for partner...</h2>
+                <p className="text-sm text-on-surface-variant mb-4">Your invite is active. Waiting for them to join.</p>
+                <Link href="/pair" className="btn-secondary py-2 px-6 rounded-full text-sm flex items-center justify-center gap-2">
+                  <span className="material-symbols-outlined text-sm">share</span> View Invite
+                </Link>
+              </>
+            ) : (
+              <>
+                <h2 className="text-xl text-on-surface mb-2 font-medium">You're flying solo</h2>
+                <p className="text-sm text-on-surface-variant mb-4">Invite someone to start your private space.</p>
+                <Link href="/pair" className="btn-primary py-2 px-6 rounded-full text-sm flex items-center justify-center gap-2">
+                  <span className="material-symbols-outlined text-sm">person_add</span> Invite Partner
+                </Link>
+              </>
+            )}
+          </div>
         )}
 
-        <DaysCounter pairedAt={couple?.paired_at || couple?.created_at || null} />
+        {couple && <DaysCounter pairedAt={couple.paired_at || couple.created_at || null} />}
 
         {/* Mood selector */}
         <div className="mt-8">

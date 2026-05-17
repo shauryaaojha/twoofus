@@ -103,20 +103,35 @@ export default function SettingsPage() {
         </p>
       </section>
 
-      {/* Our Story */}
-      <section className="glass-card rounded-xl p-6 flex flex-col gap-6">
-        <h3 className="text-2xl font-medium text-on-surface border-b border-surface-variant pb-2" style={{ fontFamily: 'var(--font-headline)' }}>Our Story</h3>
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col">
-            <label className="text-xs font-bold tracking-[0.1em] uppercase text-on-surface-variant mb-1" style={{ fontFamily: 'var(--font-label)' }}>Anniversary</label>
-            <input type="date" value={anniversary} onChange={(e) => setAnniversary(e.target.value)} onBlur={saveSettings} className="minimal-input" />
+      {/* Invite / Unpaired State */}
+      {!couple || !couple.user_b ? (
+        <section className="glass-card rounded-xl p-6 flex flex-col gap-6">
+          <h3 className="text-2xl font-medium text-on-surface border-b border-surface-variant pb-2" style={{ fontFamily: 'var(--font-headline)' }}>Connection</h3>
+          <div className="flex flex-col gap-4 items-start">
+            <p className="text-sm text-on-surface-variant">You are currently not paired with anyone. Invite a partner to start sharing moments and chatting securely.</p>
+            <button 
+              onClick={() => router.push('/pair')}
+              className="py-3 px-6 rounded-full bg-primary text-on-primary text-sm font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+            >
+              <span className="material-symbols-outlined text-[18px]">person_add</span> Invite Partner
+            </button>
           </div>
-          <div className="flex flex-col">
-            <label className="text-xs font-bold tracking-[0.1em] uppercase text-on-surface-variant mb-1" style={{ fontFamily: 'var(--font-label)' }}>Our Song URL</label>
-            <input type="url" value={songUrl} onChange={(e) => setSongUrl(e.target.value)} onBlur={saveSettings} className="minimal-input" placeholder="Spotify or Apple Music link" />
+        </section>
+      ) : (
+        <section className="glass-card rounded-xl p-6 flex flex-col gap-6">
+          <h3 className="text-2xl font-medium text-on-surface border-b border-surface-variant pb-2" style={{ fontFamily: 'var(--font-headline)' }}>Our Story</h3>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col">
+              <label className="text-xs font-bold tracking-[0.1em] uppercase text-on-surface-variant mb-1" style={{ fontFamily: 'var(--font-label)' }}>Anniversary</label>
+              <input type="date" value={anniversary} onChange={(e) => setAnniversary(e.target.value)} onBlur={saveSettings} className="minimal-input" />
+            </div>
+            <div className="flex flex-col">
+              <label className="text-xs font-bold tracking-[0.1em] uppercase text-on-surface-variant mb-1" style={{ fontFamily: 'var(--font-label)' }}>Our Song URL</label>
+              <input type="url" value={songUrl} onChange={(e) => setSongUrl(e.target.value)} onBlur={saveSettings} className="minimal-input" placeholder="Spotify or Apple Music link" />
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Privacy */}
       <section className="glass-card rounded-xl p-6 flex flex-col gap-6">

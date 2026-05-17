@@ -41,28 +41,28 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         .from('profiles').select('*').eq('id', authUser.id).single();
       if (profile) setProfile(profile);
 
-      // Fetch ACTIVE couple only
+      // Fetch couple (can be active or pending)
       const { data: couple } = await supabase
         .from('couples')
         .select('*')
         .or(`user_a.eq.${authUser.id},user_b.eq.${authUser.id}`)
-        .not('user_b', 'is', null)
         .eq('status', 'active')
         .single();
 
-      if (!couple) {
-        router.push('/pair');
-        setLoading(false);
-        return;
-      }
-      setCouple(couple);
-
-      // Fetch partner
-      const partnerId = couple.user_a === authUser.id ? couple.user_b : couple.user_a;
-      if (partnerId) {
-        const { data: partnerProfile } = await supabase
-          .from('profiles').select('*').eq('id', partnerId).single();
-        if (partnerProfile) setPartner(partnerProfile);
+      if (couple) {
+        setCouple(couple);
+        // Fetch partner if user_b exists
+        const partnerId = couple.user_a === authUser.id ? couple.user_b : couple.user_a;
+        if (partnerId) {
+          const { data: partnerProfile } = await supabase
+            .from('profiles').select('*').eq('id', partnerId).single();
+          if (partnerProfile) setPartner(partnerProfile);
+        } else {
+          setPartner(null);
+        }
+      } else {
+        setCouple(null);
+        setPartner(null);
       }
 
       setLoading(false);

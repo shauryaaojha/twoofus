@@ -130,7 +130,11 @@ export default function PairPage() {
 
   const shareLink = async () => {
     if (navigator.share) {
-      await navigator.share({ title: 'Join me on TwoOfUs', url: inviteLink });
+      await navigator.share({ 
+        title: 'Join me on TwoOfUs', 
+        text: 'I created a private space for us on TwoOfUs. Click the link to join, or paste this code in the app:\n\n',
+        url: inviteLink 
+      });
     } else {
       copyLink();
     }
@@ -222,6 +226,13 @@ export default function PairPage() {
                 Connect
               </button>
             </div>
+            
+            <button 
+              onClick={() => router.push('/home')}
+              className="mt-2 text-sm text-on-surface-variant hover:text-on-surface transition-colors"
+            >
+              Skip for now, go to Inbox
+            </button>
           </div>
         ) : (
           <div className="glass-card rounded-2xl p-8">
@@ -247,9 +258,17 @@ export default function PairPage() {
               </button>
             </div>
             {waitingForPartner && (
-              <p className="text-[11px] text-outline mt-8" style={{ fontFamily: 'var(--font-mono)' }}>
-                Waiting for your partner to join...
-              </p>
+              <div className="mt-8 flex flex-col items-center gap-4">
+                <p className="text-[11px] text-outline" style={{ fontFamily: 'var(--font-mono)' }}>
+                  Waiting for your partner to join...
+                </p>
+                <button 
+                  onClick={() => router.push('/home')}
+                  className="text-sm font-medium text-tertiary hover:text-tertiary/80 transition-colors flex items-center gap-1"
+                >
+                  Continue to Inbox <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                </button>
+              </div>
             )}
           </div>
         )}
