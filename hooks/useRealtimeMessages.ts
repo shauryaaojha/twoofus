@@ -75,7 +75,11 @@ export function useRealtimeMessages() {
         { event: 'UPDATE', schema: 'public', table: 'messages', filter: `couple_id=eq.${couple.id}` },
         (payload) => {
           const msg = payload.new as Message;
-          useChatStore.getState().updateMessage(msg.id, { seen_at: msg.seen_at, deleted_at: msg.deleted_at });
+          useChatStore.getState().updateMessage(msg.id, {
+            seen_at: msg.seen_at,
+            deleted_at: msg.deleted_at,
+            reaction: msg.reaction,
+          });
         }
       )
       .subscribe();

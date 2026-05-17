@@ -38,7 +38,7 @@ export default function ChatPage() {
   }, [couple?.id, user?.id, setPartnerTyping]);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)]">
+    <div className="flex flex-col fixed top-16 bottom-[80px] md:bottom-0 left-0 right-0 overflow-hidden bg-background">
       <ChatWindow />
       <MessageInput />
     </div>

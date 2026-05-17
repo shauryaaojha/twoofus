@@ -8,11 +8,13 @@ import { useAuthStore } from '@/lib/store/authStore';
 import { decodeBase64, encodeBase64 } from 'tweetnacl-util';
 import { usePhotoQuota } from '@/hooks/usePhotoQuota';
 import { useToastStore } from '@/lib/store/toastStore';
+import { useChatStore } from '@/lib/store/chatStore';
 
 export default function MessageInput() {
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
   const { couple, partner, user } = useAuthStore();
+  const { replyToMessage, setReplyToMessage } = useChatStore();
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -61,9 +63,11 @@ export default function MessageInput() {
       ciphertext,
       nonce,
       type: 'text',
+      reply_to: replyToMessage?.id || null,
     });
 
     setText('');
+    setReplyToMessage(null);
     setSending(false);
     inputRef.current?.focus();
   };
@@ -149,10 +153,12 @@ export default function MessageInput() {
         ciphertext,
         nonce: msgNonce,
         type: 'photo',
+        reply_to: replyToMessage?.id || null,
       });
 
       if (messageDbError) throw messageDbError;
 
+      setReplyToMessage(null);
       showToast(`Photo shared! (${remaining - 1} remaining today)`, 'success');
     } catch (err: any) {
       console.error(err);
@@ -164,7 +170,27 @@ export default function MessageInput() {
   };
 
   return (
-    <div className="fixed bottom-[80px] md:bottom-0 left-0 w-full z-40 bg-surface-container/80 backdrop-blur-xl border-t border-outline-variant/10 px-4 py-3">
+    <div className="w-full bg-surface-container/80 backdrop-blur-xl border-t border-outline-variant/10 px-4 py-3 z-10">
+      {replyToMessage && (
+        <div className="max-w-[1100px] mx-auto mb-3 flex items-center justify-between bg-surface-variant/20 backdrop-blur-md rounded-2xl px-4 py-2 border-l-4 border-primary border border-outline-variant/10 transition-all duration-300">
+          <div className="flex-1 min-w-0 pr-4">
+            <div className="text-xs text-primary font-bold">
+              Replying to {replyToMessage.sender_id === user?.id ? 'You' : (partner?.display_name || 'Partner')}
+            </div>
+            <div className="text-sm text-on-surface-variant/80 truncate mt-0.5">
+              {replyToMessage.type === 'photo' ? '📷 Photo' : (replyToMessage.plaintext || '[encrypted]')}
+            </div>
+          </div>
+          <button
+            onClick={() => setReplyToMessage(null)}
+            className="text-on-surface-variant/60 hover:text-primary transition-colors flex-shrink-0 p-1 hover:bg-surface-variant/30 rounded-full"
+            aria-label="Cancel reply"
+          >
+            <span className="material-symbols-outlined text-[20px]">close</span>
+          </button>
+        </div>
+      )}
+
       <div className="max-w-[1100px] mx-auto flex items-center gap-3">
         <button
           onClick={handlePhotoClick}

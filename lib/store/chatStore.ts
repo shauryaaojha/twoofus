@@ -5,11 +5,13 @@ interface ChatState {
   messages: Message[];
   isTyping: boolean;
   partnerTyping: boolean;
+  replyToMessage: Message | null;
   setMessages: (messages: Message[]) => void;
   addMessage: (message: Message) => void;
   updateMessage: (id: string, updates: Partial<Message>) => void;
   setTyping: (typing: boolean) => void;
   setPartnerTyping: (typing: boolean) => void;
+  setReplyToMessage: (message: Message | null) => void;
   clearMessages: () => void;
 }
 
@@ -17,6 +19,7 @@ export const useChatStore = create<ChatState>((set) => ({
   messages: [],
   isTyping: false,
   partnerTyping: false,
+  replyToMessage: null,
   setMessages: (messages) => set({ messages }),
   addMessage: (message) =>
     set((state) => {
@@ -30,5 +33,6 @@ export const useChatStore = create<ChatState>((set) => ({
     })),
   setTyping: (isTyping) => set({ isTyping }),
   setPartnerTyping: (partnerTyping) => set({ partnerTyping }),
+  setReplyToMessage: (replyToMessage) => set({ replyToMessage }),
   clearMessages: () => set({ messages: [] }),
 }));

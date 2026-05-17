@@ -237,3 +237,13 @@ body {
   from { opacity: 0; transform: translate(-50%, -20px); }
   to { opacity: 1; transform: translate(-50%, 0); }
 }
+
+/* Scroll-to-message Highlight Pulse Animation */
+@keyframes pulse-quick {
+  0%, 100% { filter: brightness(1); transform: scale(1); }
+  50% { filter: brightness(1.35) drop-shadow(0 0 15px var(--color-primary)); transform: scale(1.03); }
+}
+.animate-pulse-quick {
+  animation: pulse-quick 0.5s ease-in-out 2;
+  z-index: 10;
+}

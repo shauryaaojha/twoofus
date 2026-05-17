@@ -8,6 +8,7 @@ import { getMyKeys } from '@/lib/crypto/keyManager';
 import { useAuthStore } from '@/lib/store/authStore';
 import { decodeBase64 } from 'tweetnacl-util';
 import { useToastStore } from '@/lib/store/toastStore';
+import { useChatStore } from '@/lib/store/chatStore';
 
 function formatTime(dateStr: string) {
   const d = new Date(dateStr);
@@ -137,8 +138,10 @@ function E2EEImage({
 
 export default function MessageBubble({ message, isMine }: { message: Message; isMine: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { partner } = useAuthStore();
+  const { partner, user } = useAuthStore();
   const { show: showToast } = useToastStore();
+  const { setReplyToMessage, messages } = useChatStore();
+  const repliedMessage = message.reply_to ? messages.find((m) => m.id === message.reply_to) : null;
   const isDeleted = !!message.deleted_at;
 
   const handleReact = async (emoji: string) => {
@@ -170,7 +173,7 @@ export default function MessageBubble({ message, isMine }: { message: Message; i
   };
 
   return (
-    <div className={`flex flex-col relative group ${isMine ? 'items-end' : 'items-start'}`}>
+    <div id={`msg-${message.id}`} className={`flex flex-col relative group ${isMine ? 'items-end' : 'items-start'}`}>
       <div className={`flex items-center gap-2 max-w-[75%] md:max-w-[60%]`}>
         {isMine && !isDeleted && (
           <button
@@ -193,6 +196,32 @@ export default function MessageBubble({ message, isMine }: { message: Message; i
             <p className="italic text-on-surface-variant/60 text-sm">Message deleted</p>
           ) : (
             <>
+              {repliedMessage && (
+                <div
+                  onClick={() => {
+                    const targetEl = document.getElementById(`msg-${repliedMessage.id}`);
+                    if (targetEl) {
+                      targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      targetEl.classList.add('animate-pulse-quick');
+                      setTimeout(() => targetEl.classList.remove('animate-pulse-quick'), 1000);
+                    }
+                  }}
+                  className="mb-2 cursor-pointer bg-surface-variant/20 hover:bg-surface-variant/40 rounded-xl px-3 py-1.5 border-l-2 border-primary/60 text-left transition-colors duration-200"
+                >
+                  <div className="text-[11px] text-primary font-bold">
+                    {repliedMessage.sender_id === user?.id ? 'You' : (partner?.display_name || 'Partner')}
+                  </div>
+                  <div className="text-xs text-on-surface-variant/80 truncate mt-0.5 max-w-[200px]">
+                    {repliedMessage.deleted_at ? (
+                      <span className="italic text-xs text-on-surface-variant/50">Deleted message</span>
+                    ) : repliedMessage.type === 'photo' ? (
+                      '📷 Photo'
+                    ) : (
+                      repliedMessage.plaintext || '[encrypted]'
+                    )}
+                  </div>
+                </div>
+              )}
               {message.type === 'text' && (
                 <p className="text-[16px] leading-[24px] break-words whitespace-pre-wrap" style={{ fontFamily: 'var(--font-body)' }}>
                   {message.plaintext || '[decryption failed]'}
@@ -272,6 +301,18 @@ export default function MessageBubble({ message, isMine }: { message: Message; i
 
           {/* Actions row */}
           <div className="flex flex-col gap-1 text-sm">
+            {!isDeleted && (
+              <button
+                onClick={() => {
+                  setReplyToMessage(message);
+                  setMenuOpen(false);
+                }}
+                className="flex items-center gap-2.5 px-3 py-2 hover:bg-surface-variant/30 rounded-xl transition-colors w-full text-left"
+              >
+                <span className="material-symbols-outlined text-[18px]">reply</span>
+                <span>Reply</span>
+              </button>
+            )}
             {isMine && !isDeleted && (
               <button
                 onClick={handleDelete}
