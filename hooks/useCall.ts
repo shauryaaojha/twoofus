@@ -18,9 +18,18 @@ export function useCall() {
   const managerRef = useRef<CallManager | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const instanceIdRef = useRef<string>(crypto.randomUUID());
+  const isInCallRef = useRef(isInCall);
+  const endCallRef = useRef<() => Promise<void>>(async () => {});
+
+  useEffect(() => {
+    isInCallRef.current = isInCall;
+  }, [isInCall]);
 
   const cleanup = useCallback(() => {
     localStream?.getTracks().forEach((t) => t.stop());
+    managerRef.current?.destroy();
+    managerRef.current = null;
     setLocalStream(null);
     setRemoteStream(null);
     setIsInCall(false);
@@ -64,7 +73,7 @@ export function useCall() {
         setCallError('No answer');
       }
     }, 60000);
-  }, [couple?.id, user?.id, cleanup, remoteStream]);
+  }, [couple, user, cleanup, remoteStream]);
 
   const answerCall = useCallback(async (signal: CallSignal, video: boolean = false) => {
     if (!couple?.id || !user?.id) return;
@@ -89,40 +98,46 @@ export function useCall() {
     setIsInCall(true);
     setIncomingCall(null);
     timerRef.current = setInterval(() => setCallDuration((d) => d + 1), 1000);
-  }, [couple?.id, user?.id]);
+  }, [couple, user]);
 
   const endCall = useCallback(async () => {
     await managerRef.current?.endCall();
     cleanup();
   }, [cleanup]);
 
+  useEffect(() => {
+    endCallRef.current = endCall;
+  }, [endCall]);
+
   // Listen for incoming signals
   useEffect(() => {
     if (!couple?.id || !user?.id) return;
     const supabase = getSupabase();
     const channel = supabase
-      .channel(`call_signals:${couple.id}`)
+      .channel(`call_signals:${couple.id}:${user.id}:${instanceIdRef.current}`)
       .on('postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'call_signals', filter: `couple_id=eq.${couple.id}` },
         (payload) => {
           const signal = payload.new as CallSignal;
           if (signal.caller_id === user.id) return;
 
-          if (signal.type === 'offer' && !isInCall) {
+          if (signal.type === 'offer' && !isInCallRef.current) {
             setIncomingCall(signal);
             // Auto-decline after 60s
             setTimeout(() => setIncomingCall((cur) => cur?.id === signal.id ? null : cur), 60000);
           } else if (signal.type === 'answer' || signal.type === 'ice') {
             managerRef.current?.signal(signal.payload as unknown as SimplePeer.SignalData);
           } else if (signal.type === 'end' || signal.type === 'reject') {
-            endCall();
+            endCallRef.current();
           }
         }
       )
       .subscribe();
 
-    return () => { channel.unsubscribe(); };
-  }, [couple?.id, user?.id, isInCall, endCall]);
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [couple?.id, user?.id]);
 
   return {
     incomingCall, isInCall, localStream, remoteStream, callDuration, callError,
