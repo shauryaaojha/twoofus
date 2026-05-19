@@ -29,16 +29,32 @@ export default function ChatWindow({ loadMoreMessages, hasMoreMessages, isLoadin
   const lastMessageIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (messages.length > 0) {
-      const currentLastMessageId = messages[messages.length - 1].id;
-      if (currentLastMessageId !== lastMessageIdRef.current) {
-        // A new message was added at the bottom, so we should auto-scroll
+    if (messages.length === 0) return;
+
+    const currentLastMessageId = messages[messages.length - 1].id;
+    const isInitialLoad = lastMessageIdRef.current === null;
+
+    if (currentLastMessageId !== lastMessageIdRef.current) {
+      lastMessageIdRef.current = currentLastMessageId;
+      
+      if (isInitialLoad) {
+        // Instant scroll for initial load to prevent smooth scroll from triggering the top-scroll fetch
+        if (scrollRef.current) {
+          scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+        setTimeout(() => {
+          if (scrollRef.current) {
+            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+          }
+        }, 100);
+        return;
+      } else {
+        // A new message was added later, enable auto-scroll
         setShouldAutoScroll(true);
-        lastMessageIdRef.current = currentLastMessageId;
       }
     }
     
-    if (shouldAutoScroll) {
+    if (shouldAutoScroll && !isInitialLoad) {
       endRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, partnerTyping, shouldAutoScroll]);
