@@ -4,15 +4,14 @@ import { useEffect, useCallback, useRef } from 'react';
 import { getSupabase } from '@/lib/supabase/client';
 import { useAuthStore } from '@/lib/store/authStore';
 import { useCallStore } from '@/lib/store/callStore';
-import { CallManager } from '@/lib/webrtc/callManager';
+import { AgoraCallManager } from '@/lib/agora/agoraCallManager';
 import { encryptMessage } from '@/lib/crypto/e2ee';
 import { getMyKeys } from '@/lib/crypto/keyManager';
 import { decodeBase64 } from 'tweetnacl-util';
 import type { CallSignal } from '@/types';
-import type SimplePeer from 'simple-peer';
 
 // Singletons to preserve state and manager references across hook instances
-let activeManager: CallManager | null = null;
+let activeManager: AgoraCallManager | null = null;
 let activeTimer: NodeJS.Timeout | null = null;
 let activeTimeout: NodeJS.Timeout | null = null;
 let activeChannel: any = null;
@@ -30,7 +29,6 @@ const generateUUID = () => {
 
 const instanceId = generateUUID();
 const processedSignalIds = new Set<string>();
-const signalQueue: SimplePeer.SignalData[] = [];
 
 /**
  * Inserts a 'call' type message into the chat to show call events
@@ -91,10 +89,7 @@ export function useCall() {
   const setRemoteStream = useCallStore((s) => s.setRemoteStream);
   const resetCallState = useCallStore((s) => s.resetCallState);
 
-  const cleanup = useCallback((skipCallLog?: boolean) => {
-    // Clear the early signal queue
-    signalQueue.length = 0;
-    
+  const cleanup = useCallback(() => {
     const { localStream: currentLocal, remoteStream: currentRemote } = useCallStore.getState();
     currentLocal?.getTracks().forEach((t) => t.stop());
     currentRemote?.getTracks().forEach((t) => t.stop());
@@ -131,76 +126,80 @@ export function useCall() {
     setCallError(null);
     callIsVideo = video;
 
-    let stream: MediaStream;
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true, video });
-      console.log('[useCall] Got local media stream:', {
-        audio: stream.getAudioTracks().length,
-        video: stream.getVideoTracks().length,
-      });
-    } catch (err) {
-      setIsInCall(false);
-      const msg = err instanceof DOMException && err.name === 'NotAllowedError'
-        ? 'Microphone access is required. Please enable it in browser settings.'
-        : 'Could not access microphone/camera.';
-      setCallError(msg);
-      return;
-    }
+      const manager = new AgoraCallManager(couple.id, user.id);
+      activeManager = manager;
 
-    setLocalStream(stream);
-    const manager = new CallManager(couple.id, user.id);
-    activeManager = manager;
-    
-    try {
-      await manager.startCall(stream, (remote) => {
-        console.log('[useCall] Remote stream received in startCall callback');
-        setRemoteStream(remote);
-        // Connected — clear auto-decline timeout
-        if (activeTimeout) {
-          clearTimeout(activeTimeout);
-          activeTimeout = null;
+      const { localStream: stream } = await manager.startCall(
+        video,
+        (remoteMediaStream) => {
+          console.log('[useCall] Remote stream received');
+          setRemoteStream(remoteMediaStream);
+          // Connected — clear auto-decline timeout
+          if (activeTimeout) {
+            clearTimeout(activeTimeout);
+            activeTimeout = null;
+          }
+        },
+        () => {
+          // Remote user left — end the call
+          console.log('[useCall] Remote user left, ending call');
+          endCallInternal();
         }
+      );
+
+      setLocalStream(stream);
+
+      // Send call-invite signal via Supabase so partner's device rings
+      const supabase = getSupabase();
+      await supabase.from('call_signals').insert({
+        couple_id: couple.id,
+        caller_id: user.id,
+        type: 'call-invite',
+        payload: { callType: video ? 'video' : 'voice' },
       });
+
+      callStartTime = Date.now();
+      
+      if (activeTimer) clearInterval(activeTimer);
+      activeTimer = setInterval(() => {
+        setCallDuration((d) => d + 1);
+      }, 1000);
+
+      // Auto-end if no answer after 60 seconds
+      if (activeTimeout) clearTimeout(activeTimeout);
+      activeTimeout = setTimeout(async () => {
+        if (!useCallStore.getState().remoteStream) {
+          // Log missed call
+          if (couple?.id && user?.id) {
+            await insertCallMessage(couple.id, user.id, {
+              callType: callIsVideo ? 'video' : 'voice',
+              status: 'missed',
+            });
+          }
+          // Send end signal
+          const supabase = getSupabase();
+          await supabase.from('call_signals').insert({
+            couple_id: couple.id,
+            caller_id: user.id,
+            type: 'end',
+            payload: {},
+          });
+          cleanup();
+          setCallError('No answer');
+        }
+      }, 60000);
     } catch (err) {
       console.error('[useCall] Failed to start call:', err);
-      stream.getTracks().forEach(t => t.stop());
       setIsInCall(false);
       setLocalStream(null);
-      setCallError('Failed to establish peer connection.');
-      return;
+      activeManager?.destroy();
+      activeManager = null;
+      const msg = err instanceof DOMException && err.name === 'NotAllowedError'
+        ? 'Microphone access is required. Please enable it in browser settings.'
+        : 'Could not start call. Check your connection.';
+      setCallError(msg);
     }
-
-    // Flush any early queued signals
-    while (signalQueue.length > 0) {
-      const qSignal = signalQueue.shift();
-      if (qSignal) {
-        manager.signal(qSignal);
-      }
-    }
-    
-    callStartTime = Date.now();
-    
-    if (activeTimer) clearInterval(activeTimer);
-    activeTimer = setInterval(() => {
-      setCallDuration((d) => d + 1);
-    }, 1000);
-
-    // Auto-end if no answer after 60 seconds
-    if (activeTimeout) clearTimeout(activeTimeout);
-    activeTimeout = setTimeout(async () => {
-      if (!useCallStore.getState().remoteStream) {
-        // Log missed call
-        if (couple?.id && user?.id) {
-          await insertCallMessage(couple.id, user.id, {
-            callType: callIsVideo ? 'video' : 'voice',
-            status: 'missed',
-          });
-        }
-        await activeManager?.endCall();
-        cleanup(true);
-        setCallError('No answer');
-      }
-    }, 60000);
   }, [couple, user, cleanup, setLocalStream, setRemoteStream, setIsInCall, setCallDuration, setCallError]);
 
   const answerCall = useCallback(async (signal: CallSignal, video: boolean = false) => {
@@ -218,59 +217,55 @@ export function useCall() {
     setIncomingCall(null);
     callIsVideo = video;
 
-    let stream: MediaStream;
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true, video });
-      console.log('[useCall] Got local media stream for answer:', {
-        audio: stream.getAudioTracks().length,
-        video: stream.getVideoTracks().length,
-      });
-    } catch (err) {
-      setIsInCall(false);
-      const msg = err instanceof DOMException && err.name === 'NotAllowedError'
-        ? 'Microphone access is required to accept calls.'
-        : 'Could not access microphone/camera.';
-      setCallError(msg);
-      return;
-    }
+      const manager = new AgoraCallManager(couple.id, user.id);
+      activeManager = manager;
 
-    setLocalStream(stream);
-    const manager = new CallManager(couple.id, user.id);
-    activeManager = manager;
-    
-    try {
-      await manager.answerCall(stream, signal.payload as unknown as SimplePeer.SignalData, (remote) => {
-        console.log('[useCall] Remote stream received in answerCall callback');
-        setRemoteStream(remote);
+      const { localStream: stream } = await manager.startCall(
+        video,
+        (remoteMediaStream) => {
+          console.log('[useCall] Remote stream received in answerCall');
+          setRemoteStream(remoteMediaStream);
+        },
+        () => {
+          console.log('[useCall] Remote user left, ending call');
+          endCallInternal();
+        }
+      );
+
+      setLocalStream(stream);
+
+      // Send call-answer signal
+      const supabase = getSupabase();
+      await supabase.from('call_signals').insert({
+        couple_id: couple.id,
+        caller_id: user.id,
+        type: 'call-answer',
+        payload: { callType: video ? 'video' : 'voice' },
       });
+
+      // Log "call started" message — the answerer logs it
+      callStartTime = Date.now();
+      await insertCallMessage(couple.id, user.id, {
+        callType: callIsVideo ? 'video' : 'voice',
+        status: 'started',
+      });
+
+      if (activeTimer) clearInterval(activeTimer);
+      activeTimer = setInterval(() => {
+        setCallDuration((d) => d + 1);
+      }, 1000);
     } catch (err) {
       console.error('[useCall] Failed to answer call:', err);
-      stream.getTracks().forEach(t => t.stop());
       setIsInCall(false);
       setLocalStream(null);
-      setCallError('Failed to establish peer connection.');
-      return;
+      activeManager?.destroy();
+      activeManager = null;
+      const msg = err instanceof DOMException && err.name === 'NotAllowedError'
+        ? 'Microphone access is required to accept calls.'
+        : 'Could not join call. Check your connection.';
+      setCallError(msg);
     }
-
-    // Flush early candidates
-    while (signalQueue.length > 0) {
-      const qSignal = signalQueue.shift();
-      if (qSignal) {
-        manager.signal(qSignal);
-      }
-    }
-    
-    // Log "call started" message — the answerer logs it
-    callStartTime = Date.now();
-    await insertCallMessage(couple.id, user.id, {
-      callType: callIsVideo ? 'video' : 'voice',
-      status: 'started',
-    });
-
-    if (activeTimer) clearInterval(activeTimer);
-    activeTimer = setInterval(() => {
-      setCallDuration((d) => d + 1);
-    }, 1000);
   }, [couple, user, setLocalStream, setRemoteStream, setIsInCall, setIncomingCall, setCallDuration, setCallError]);
 
   const declineCall = useCallback(async () => {
@@ -292,6 +287,21 @@ export function useCall() {
     setIncomingCall(null);
   }, [couple, user, incomingCall, setIncomingCall]);
 
+  // Internal end call (used by remote-left handler)
+  const endCallInternal = async () => {
+    const duration = callStartTime ? Math.round((Date.now() - callStartTime) / 1000) : 0;
+    const { couple: c, user: u } = useAuthStore.getState();
+    
+    if (c?.id && u?.id && duration > 0) {
+      await insertCallMessage(c.id, u.id, {
+        callType: callIsVideo ? 'video' : 'voice',
+        status: 'ended',
+        duration,
+      });
+    }
+    cleanup();
+  };
+
   const endCall = useCallback(async () => {
     // Calculate call duration before cleanup
     const duration = callStartTime ? Math.round((Date.now() - callStartTime) / 1000) : 0;
@@ -305,13 +315,21 @@ export function useCall() {
       });
     }
 
-    if (activeManager) {
-      await activeManager.endCall();
+    // Send end signal via Supabase
+    if (couple?.id && user?.id) {
+      const supabase = getSupabase();
+      await supabase.from('call_signals').insert({
+        couple_id: couple.id,
+        caller_id: user.id,
+        type: 'end',
+        payload: {},
+      });
     }
-    cleanup(true);
+
+    cleanup();
   }, [cleanup, couple, user]);
 
-  // Listen for incoming signals
+  // Listen for incoming signals via Supabase Realtime
   useEffect(() => {
     if (!couple?.id || !user?.id) return;
     
@@ -347,22 +365,21 @@ export function useCall() {
 
           console.log('[useCall] Call signal received:', signal.type, 'id:', signal.id);
 
-          if (signal.type === 'offer' && !useCallStore.getState().isInCall) {
+          if (signal.type === 'call-invite' && !useCallStore.getState().isInCall) {
             setIncomingCall(signal);
-            // Auto-decline after 60s
+            // Auto-dismiss after 60s
             setTimeout(() => {
               if (useCallStore.getState().incomingCall?.id === signal.id) {
                 setIncomingCall(null);
               }
             }, 60000);
-          } else if (signal.type === 'answer' || signal.type === 'ice') {
-            if (activeManager) {
-              console.log('[useCall] Forwarding signal to active manager:', signal.type);
-              activeManager.signal(signal.payload as unknown as SimplePeer.SignalData);
-            } else {
-              console.log('[useCall] Queuing signal (no active manager yet):', signal.type);
-              signalQueue.push(signal.payload as unknown as SimplePeer.SignalData);
+          } else if (signal.type === 'call-answer') {
+            // Partner answered — clear the auto-decline timeout
+            if (activeTimeout) {
+              clearTimeout(activeTimeout);
+              activeTimeout = null;
             }
+            console.log('[useCall] Partner answered the call');
           } else if (signal.type === 'end' || signal.type === 'reject') {
             console.log('[useCall] Call ended/rejected by remote');
             cleanup();
@@ -387,6 +404,9 @@ export function useCall() {
     };
   }, [couple?.id, user?.id, setIncomingCall, cleanup]);
 
+  // Expose the Agora manager for direct track controls (mute/video/camera)
+  const getActiveManager = useCallback(() => activeManager, []);
+
   return {
     incomingCall,
     isInCall,
@@ -399,5 +419,6 @@ export function useCall() {
     declineCall,
     endCall,
     setIncomingCall,
+    getActiveManager,
   };
 }

@@ -108,23 +108,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <IncomingCallModal
           callerName={partner.display_name || 'Partner'}
           callerAvatar={partner.avatar_url}
-          isVideo={!!(
-            incomingCall.payload &&
-            typeof incomingCall.payload === 'object' &&
-            'sdp' in incomingCall.payload &&
-            typeof (incomingCall.payload as any).sdp === 'string' &&
-            (incomingCall.payload as any).sdp.includes('m=video')
-          )}
+          isVideo={incomingCall.payload?.callType === 'video'}
           onAccept={() => {
-            const isVideoCall = !!(
-              incomingCall.payload &&
-              typeof incomingCall.payload === 'object' &&
-              'sdp' in incomingCall.payload &&
-              typeof (incomingCall.payload as any).sdp === 'string' &&
-              (incomingCall.payload as any).sdp.includes('m=video')
-            );
-            console.log('Answering incoming call. Detected video support:', isVideoCall);
-            answerCall(incomingCall, isVideoCall);
+            const isVideoCall = incomingCall.payload?.callType === 'video';
+            console.log('Answering incoming call. Video:', isVideoCall);
+            answerCall(incomingCall, !!isVideoCall);
             router.push('/call');
           }}
           onDecline={declineCall}

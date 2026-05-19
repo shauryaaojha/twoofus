@@ -8,22 +8,31 @@ import CallScreenComponent from '@/components/call/CallScreen';
 
 export default function CallPage() {
   const { partner } = useAuthStore();
-  const { isInCall, localStream, remoteStream, callDuration, callError, startCall, endCall } = useCall();
+  const { isInCall, localStream, remoteStream, callDuration, callError, startCall, endCall, getActiveManager } = useCall();
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const router = useRouter();
 
   const toggleMute = () => {
-    if (localStream) {
-      localStream.getAudioTracks().forEach((t) => { t.enabled = !t.enabled; });
-      setIsMuted(!isMuted);
+    const manager = getActiveManager();
+    if (manager) {
+      const muted = manager.toggleMute();
+      setIsMuted(muted);
     }
   };
 
   const toggleVideo = () => {
-    if (localStream) {
-      localStream.getVideoTracks().forEach((t) => { t.enabled = !t.enabled; });
-      setIsVideoOff(!isVideoOff);
+    const manager = getActiveManager();
+    if (manager) {
+      const videoOff = manager.toggleVideo();
+      setIsVideoOff(videoOff);
+    }
+  };
+
+  const flipCamera = async () => {
+    const manager = getActiveManager();
+    if (manager) {
+      await manager.switchCamera();
     }
   };
 
@@ -53,7 +62,7 @@ export default function CallPage() {
         duration={callDuration}
         onToggleMute={toggleMute}
         onToggleVideo={toggleVideo}
-        onFlipCamera={() => {}}
+        onFlipCamera={flipCamera}
         onEndCall={handleEndCall}
         isMuted={isMuted}
         isVideoOff={isVideoOff}
@@ -101,7 +110,7 @@ export default function CallPage() {
         </div>
 
         <p className="text-[11px] text-outline mt-8" style={{ fontFamily: 'var(--font-mono)' }}>
-          Calls are peer-to-peer encrypted
+          Powered by Agora
         </p>
       </div>
     </div>

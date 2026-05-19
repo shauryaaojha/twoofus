@@ -71,7 +71,7 @@ export interface CallSignal {
   id: string;
   couple_id: string;
   caller_id: string;
-  type: 'offer' | 'answer' | 'ice' | 'end' | 'reject';
+  type: 'call-invite' | 'call-answer' | 'end' | 'reject';
   payload: Record<string, unknown>;
   created_at: string;
 }

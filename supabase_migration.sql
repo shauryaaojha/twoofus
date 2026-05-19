@@ -167,7 +167,7 @@ create table if not exists public.call_signals (
   id uuid primary key default gen_random_uuid(),
   couple_id uuid not null references public.couples(id),
   caller_id uuid not null references public.profiles(id),
-  type text not null check (type in ('offer', 'answer', 'ice', 'end', 'reject')),
+  type text not null check (type in ('call-invite', 'call-answer', 'end', 'reject')),
   payload jsonb not null default '{}',
   created_at timestamptz default now()
 );

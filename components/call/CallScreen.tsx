@@ -33,8 +33,7 @@ export default function CallScreen({
   const [remoteVideoActive, setRemoteVideoActive] = useState(false);
   const [localVideoActive, setLocalVideoActive] = useState(false);
 
-  // Attach remote stream — use both a video element AND a separate audio element
-  // This ensures audio always plays even if video is hidden
+  // Attach remote stream
   useEffect(() => {
     if (!remoteStream) {
       setRemoteVideoActive(false);
@@ -49,7 +48,6 @@ export default function CallScreen({
     // Attach to video element for video display
     if (remoteVideoRef.current) {
       remoteVideoRef.current.srcObject = remoteStream;
-      // Force play (browsers may block autoplay)
       remoteVideoRef.current.play().catch(err => {
         console.warn('[CallScreen] Remote video autoplay blocked:', err);
       });
@@ -65,7 +63,7 @@ export default function CallScreen({
 
     const updateTrackStatus = () => {
       const videoTracks = remoteStream.getVideoTracks();
-      const hasVideo = videoTracks.length > 0 && videoTracks.some(t => t.enabled && !t.muted && t.readyState === 'live');
+      const hasVideo = videoTracks.length > 0 && videoTracks.some(t => t.enabled && t.readyState === 'live');
       setRemoteVideoActive(hasVideo);
     };
 
@@ -79,14 +77,6 @@ export default function CallScreen({
       track.addEventListener('mute', updateTrackStatus);
       track.addEventListener('unmute', updateTrackStatus);
       track.addEventListener('ended', updateTrackStatus);
-    });
-
-    // Also listen for audio track state changes
-    const audioTracks = remoteStream.getAudioTracks();
-    audioTracks.forEach(track => {
-      track.addEventListener('ended', () => {
-        console.warn('[CallScreen] Remote audio track ended');
-      });
     });
 
     return () => {
