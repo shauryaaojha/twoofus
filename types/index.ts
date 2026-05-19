@@ -1,3 +1,6 @@
+export type UITheme = 'midnight' | 'sunrise' | 'forest' | 'ocean' | 'rose-gold' | 'monochrome' | 'cyberpunk';
+export type ChatTheme = 'soft-blush' | 'bold-gradient' | 'minimal-light' | 'dark-elegant' | 'playful-bubbles' | 'neon-glow' | 'watercolor' | 'film-strip' | 'glassmorphic' | 'couple-custom';
+
 export interface Profile {
   id: string;
   display_name: string;
@@ -7,6 +10,7 @@ export interface Profile {
   key_salt: string | null;
   key_iv: string | null;
   mood: string;
+  ui_theme: UITheme;
   created_at: string;
 }
 
@@ -22,6 +26,13 @@ export interface Couple {
   status: 'active' | 'ended' | 'blocked';
   ended_at: string | null;
   created_at: string;
+  chat_theme: ChatTheme;
+  chat_bg_url: string | null;
+  chat_bg_custom_colors: {
+    myColor: string;
+    theirColor: string;
+    shape: 'pill' | 'rounded' | 'square';
+  } | null;
 }
 
 export interface Message {

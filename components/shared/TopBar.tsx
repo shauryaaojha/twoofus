@@ -19,7 +19,10 @@ export default function TopBar() {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-5 h-16 bg-surface/80 backdrop-blur-xl md:px-[120px]">
+    <header 
+      className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-5 h-16 backdrop-blur-xl md:px-[120px]"
+      style={{ backgroundColor: 'color-mix(in srgb, var(--color-surface) 80%, transparent)' }}
+    >
       <div className="flex items-center gap-4">
         {partner?.avatar_url ? (
           <img
@@ -39,6 +42,9 @@ export default function TopBar() {
         </h1>
       </div>
       <div className="flex items-center gap-3">
+        <Link href="/chat" aria-label="Open chat" className="text-primary hover:text-primary-fixed transition-colors">
+          <span className="material-symbols-outlined">chat</span>
+        </Link>
         <Link href="/call" aria-label="Start call" className="text-primary hover:text-primary-fixed transition-colors">
           <span className="material-symbols-outlined">videocam</span>
         </Link>

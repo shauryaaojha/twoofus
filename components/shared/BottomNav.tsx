@@ -15,7 +15,10 @@ export default function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-6 bg-surface-container/80 backdrop-blur-xl border-t border-outline-variant/10 shadow-[0_-4px_20px_rgba(0,0,0,0.4)] h-[80px] rounded-t-xl">
+    <nav 
+      className="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-6 backdrop-blur-xl border-t border-outline-variant/10 shadow-[0_-4px_20px_rgba(0,0,0,0.4)] h-[80px] rounded-t-xl"
+      style={{ backgroundColor: 'color-mix(in srgb, var(--color-surface-container) 80%, transparent)' }}
+    >
       {navItems.map((item) => {
         const isActive = pathname === item.href;
         return (

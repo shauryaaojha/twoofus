@@ -9,6 +9,8 @@ import { useAuthStore } from '@/lib/store/authStore';
 import { decodeBase64 } from 'tweetnacl-util';
 import { useToastStore } from '@/lib/store/toastStore';
 import { useChatStore } from '@/lib/store/chatStore';
+import { useThemeStore } from '@/lib/store/themeStore';
+import { chatThemes } from '@/lib/themes/chatThemes';
 
 function formatTime(dateStr: string) {
   const d = new Date(dateStr);
@@ -141,6 +143,9 @@ export default function MessageBubble({ message, isMine }: { message: Message; i
   const { partner, user } = useAuthStore();
   const { show: showToast } = useToastStore();
   const { setReplyToMessage, messages } = useChatStore();
+  const currentChatTheme = useThemeStore((s) => s.chatTheme);
+  const themeTokens = chatThemes[currentChatTheme] || chatThemes['soft-blush'];
+
   const repliedMessage = message.reply_to ? messages.find((m) => m.id === message.reply_to) : null;
   const isDeleted = !!message.deleted_at;
 
@@ -189,11 +194,11 @@ export default function MessageBubble({ message, isMine }: { message: Message; i
         )}
 
         <div
-          className={`px-4 py-3 relative ${
-            isMine
-              ? 'bg-gradient-to-br from-primary-container to-primary-container/85 text-on-primary-container rounded-[20px] rounded-br-md shadow-sm'
-              : 'glass-card text-on-surface rounded-[20px] rounded-bl-md shadow-sm'
-          }`}
+          className={`relative ${isMine
+            ? 'rounded-[20px] rounded-br-md shadow-sm'
+            : 'rounded-[20px] rounded-bl-md shadow-sm'
+            }`}
+          style={isMine ? themeTokens.myBubble : themeTokens.theirBubble}
         >
           {isDeleted ? (
             <p className="italic text-on-surface-variant/60 text-sm">Message deleted</p>
@@ -258,9 +263,8 @@ export default function MessageBubble({ message, isMine }: { message: Message; i
           {/* Reaction display */}
           {message.reaction && (
             <div
-              className={`absolute -bottom-2 ${
-                isMine ? 'left-3' : 'right-3'
-              } bg-surface-container-high border border-outline-variant/20 rounded-full px-1.5 py-0.5 text-xs shadow-md z-10`}
+              className={`absolute -bottom-2 ${isMine ? 'left-3' : 'right-3'
+                } bg-surface-container-high border border-outline-variant/20 rounded-full px-1.5 py-0.5 text-xs shadow-md z-10`}
             >
               {message.reaction}
             </div>
@@ -281,9 +285,8 @@ export default function MessageBubble({ message, isMine }: { message: Message; i
       {/* Floating Action Menu */}
       {menuOpen && (
         <div
-          className={`absolute z-30 mt-1 top-full ${
-            isMine ? 'right-0' : 'left-0'
-          } bg-surface-container-high/95 backdrop-blur-xl border border-outline-variant/20 rounded-2xl shadow-xl p-3 flex flex-col gap-2.5 min-w-[200px] animate-fade-in`}
+          className={`absolute z-30 mt-1 top-full ${isMine ? 'right-0' : 'left-0'
+            } bg-surface-container-high/95 backdrop-blur-xl border border-outline-variant/20 rounded-2xl shadow-xl p-3 flex flex-col gap-2.5 min-w-[200px] animate-fade-in`}
         >
           {/* Reaction row */}
           {!isDeleted && (
@@ -292,9 +295,8 @@ export default function MessageBubble({ message, isMine }: { message: Message; i
                 <button
                   key={emoji}
                   onClick={() => handleReact(emoji)}
-                  className={`text-lg hover:scale-125 transition-transform p-1 rounded-md ${
-                    message.reaction === emoji ? 'bg-primary/20' : ''
-                  }`}
+                  className={`text-lg hover:scale-125 transition-transform p-1 rounded-md ${message.reaction === emoji ? 'bg-primary/20' : ''
+                    }`}
                 >
                   {emoji}
                 </button>

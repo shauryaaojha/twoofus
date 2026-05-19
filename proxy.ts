@@ -23,10 +23,8 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  // Use getSession instead of getUser in middleware for faster edge execution
-  // and to avoid local Windows Edge runtime fetch issues.
-  const { data: { session } } = await supabase.auth.getSession();
-  const user = session?.user;
+  // Use getUser instead of getSession to avoid security warnings
+  const { data: { user } } = await supabase.auth.getUser();
 
   // Protect app routes
   const isAppRoute = request.nextUrl.pathname.startsWith('/home') ||

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { getSupabase } from '@/lib/supabase/client';
 import { useAuthStore } from '@/lib/store/authStore';
 import { clearAllKeys, hasSessionKeys } from '@/lib/crypto/keyManager';
@@ -11,13 +11,18 @@ import LoadingScreen from '@/components/shared/LoadingScreen';
 import IncomingCallModal from '@/components/call/IncomingCallModal';
 import Toast from '@/components/shared/Toast';
 import { useCall } from '@/hooks/useCall';
+import { useThemeInit } from '@/hooks/useTheme';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { setUser, setProfile, setCouple, setPartner, setLoading, isLoading, reset } = useAuthStore();
   const [initialized, setInitialized] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+  const isChatPage = pathname === '/chat';
   const { incomingCall, answerCall, declineCall } = useCall();
   const partner = useAuthStore((s) => s.partner);
+
+  useThemeInit(); // Initialize and sync themes
 
   useEffect(() => {
     const init = async () => {
@@ -34,13 +39,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       const { data: { user: authUser } } = await supabase.auth.getUser();
 
-      if (!authUser) { 
+      if (!authUser) {
         clearAllKeys();
         reset();
         setLoading(false);
         setInitialized(true);
-        setTimeout(() => router.push('/login'), 0); 
-        return; 
+        setTimeout(() => router.push('/login'), 0);
+        return;
       }
 
       setUser({ id: authUser.id, email: authUser.email || '' });
@@ -95,9 +100,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <TopBar />
-      <main className="pt-16 pb-[100px] md:pb-0 min-h-screen">{children}</main>
-      <BottomNav />
+      {!isChatPage && <TopBar />}
+      <main className={`pt-16 pb-[100px] md:pb-0 min-h-screen ${isChatPage ? '!pt-0 !pb-0' : ''}`}>{children}</main>
+      {!isChatPage && <BottomNav />}
       <Toast />
       {incomingCall && partner && (
         <IncomingCallModal

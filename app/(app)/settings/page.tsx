@@ -6,6 +6,9 @@ import { useAuthStore } from '@/lib/store/authStore';
 import { getSupabase } from '@/lib/supabase/client';
 import { exportPrivateKey, importPrivateKey, clearAllKeys } from '@/lib/crypto/keyManager';
 import { useToastStore } from '@/lib/store/toastStore';
+import ThemeSwitcher from '@/components/themes/ThemeSwitcher';
+import ChatThemePicker from '@/components/themes/ChatThemePicker';
+import ChatBgGallery from '@/components/themes/ChatBgGallery';
 
 export default function SettingsPage() {
   const { profile, couple, user, reset, setProfile } = useAuthStore();
@@ -168,13 +171,40 @@ export default function SettingsPage() {
         </div>
       </section>
 
+      {/* Theming */}
+      <section className="glass-card rounded-xl p-6 flex flex-col gap-8">
+        <div>
+          <h3 className="text-2xl font-medium text-on-surface border-b border-surface-variant pb-2 mb-4" style={{ fontFamily: 'var(--font-headline)' }}>UI Theme</h3>
+          <p className="text-sm text-on-surface-variant mb-4">Set the colors for your app. This only affects you.</p>
+          <ThemeSwitcher />
+        </div>
+
+        <div>
+          <div className="flex justify-between items-end border-b border-surface-variant pb-2 mb-4">
+            <h3 className="text-2xl font-medium text-on-surface" style={{ fontFamily: 'var(--font-headline)' }}>Chat Theme</h3>
+            <span className="text-xs font-medium bg-primary/20 text-primary px-2 py-1 rounded-md uppercase tracking-wider">Shared</span>
+          </div>
+          <p className="text-sm text-on-surface-variant mb-4">Set the bubble styles for your chat. Both of you will see this theme.</p>
+          <ChatThemePicker />
+        </div>
+
+        <div>
+          <div className="flex justify-between items-end border-b border-surface-variant pb-2 mb-4">
+            <h3 className="text-2xl font-medium text-on-surface" style={{ fontFamily: 'var(--font-headline)' }}>Chat Background</h3>
+            <span className="text-xs font-medium bg-primary/20 text-primary px-2 py-1 rounded-md uppercase tracking-wider">Shared</span>
+          </div>
+          <p className="text-sm text-on-surface-variant mb-4">Set the wallpaper behind your messages.</p>
+          <ChatBgGallery />
+        </div>
+      </section>
+
       {/* Invite / Unpaired State */}
       {!couple || !couple.user_b ? (
         <section className="glass-card rounded-xl p-6 flex flex-col gap-6">
           <h3 className="text-2xl font-medium text-on-surface border-b border-surface-variant pb-2" style={{ fontFamily: 'var(--font-headline)' }}>Connection</h3>
           <div className="flex flex-col gap-4 items-start">
             <p className="text-sm text-on-surface-variant">You are currently not paired with anyone. Invite a partner to start sharing moments and chatting securely.</p>
-            <button 
+            <button
               onClick={() => router.push('/pair')}
               className="py-3 px-6 rounded-full bg-primary text-on-primary text-sm font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
             >

@@ -17,10 +17,21 @@ export default function MessageInput() {
   const { replyToMessage, setReplyToMessage } = useChatStore();
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const channelRef = useRef<ReturnType<ReturnType<typeof getSupabase>['channel']> | null>(null);
   const { canUpload, incrementQuota, remaining } = usePhotoQuota();
   const { show: showToast } = useToastStore();
+
+  useEffect(() => {
+    // Dynamically load heic2any to avoid Next.js Turbopack crash
+    if (typeof window !== 'undefined' && !(window as any).heic2any) {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  }, []);
 
   // Subscribe to typing channel once
   useEffect(() => {
@@ -80,6 +91,14 @@ export default function MessageInput() {
     inputRef.current?.focus();
   };
 
+  const handleCameraClick = () => {
+    if (!canUpload) {
+      showToast('Daily photo quota reached (5 photos max)', 'error');
+      return;
+    }
+    cameraInputRef.current?.click();
+  };
+
   const handlePhotoClick = () => {
     if (!canUpload) {
       showToast('Daily photo quota reached (5 photos max)', 'error');
@@ -89,13 +108,29 @@ export default function MessageInput() {
   };
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    let file = e.target.files?.[0];
     if (!file || !couple?.id || !partner?.public_key || !user?.id || sending) return;
 
     setSending(true);
-    showToast('Encrypting and uploading photo...', 'info');
 
     try {
+      // Handle HEIC/HEIF conversion
+      if (file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif') || file.type === 'image/heic' || file.type === 'image/heif') {
+        showToast('Converting HEIC image...', 'info');
+        const heic2any = (window as any).heic2any;
+        if (!heic2any) throw new Error('HEIC converter not loaded yet. Please try again in a moment.');
+
+        const convertedBlob = await heic2any({
+          blob: file,
+          toType: 'image/jpeg',
+          quality: 0.8
+        });
+        
+        const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+        file = new File([blob], file.name.replace(/\.heic$|\.heif$/i, '.jpg'), { type: 'image/jpeg' });
+      }
+
+      showToast('Encrypting and uploading photo...', 'info');
       const keys = getMyKeys();
       if (!keys) {
         showToast('Decryption keys not loaded. Please re-login.', 'error');
@@ -182,6 +217,7 @@ export default function MessageInput() {
     } finally {
       setSending(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
+      if (cameraInputRef.current) cameraInputRef.current.value = '';
     }
   };
 
@@ -209,17 +245,33 @@ export default function MessageInput() {
 
       <div className="max-w-[1100px] mx-auto flex items-center gap-3">
         <button
+          onClick={handleCameraClick}
+          disabled={sending}
+          className="text-on-surface-variant hover:text-primary transition-colors flex-shrink-0 disabled:opacity-50"
+          aria-label="Take photo"
+        >
+          <span className="material-symbols-outlined text-[24px]">photo_camera</span>
+        </button>
+        <button
           onClick={handlePhotoClick}
           disabled={sending}
           className="text-on-surface-variant hover:text-primary transition-colors flex-shrink-0 disabled:opacity-50"
           aria-label="Send photo"
         >
-          <span className="material-symbols-outlined text-[24px]">photo_camera</span>
+          <span className="material-symbols-outlined text-[24px]">image</span>
         </button>
         <input
           type="file"
           ref={fileInputRef}
-          accept="image/*"
+          accept="image/*, .heic, .heif"
+          className="hidden"
+          onChange={handlePhotoUpload}
+        />
+        <input
+          type="file"
+          ref={cameraInputRef}
+          accept="image/*, .heic, .heif"
+          capture="environment"
           className="hidden"
           onChange={handlePhotoUpload}
         />

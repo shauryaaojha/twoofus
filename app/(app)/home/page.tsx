@@ -64,7 +64,7 @@ export default function HomePage() {
           </div>
         )}
 
-        {couple && <DaysCounter pairedAt={couple.paired_at || couple.created_at || null} />}
+        {couple && <DaysCounter pairedAt={couple.anniversary_date || couple.paired_at || couple.created_at || null} />}
 
         {/* Mood selector */}
         <div className="mt-8">
