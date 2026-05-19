@@ -1,4 +1,6 @@
 'use client';
+import { useEffect } from 'react';
+import { toneGenerator } from '@/lib/audio/tones';
 
 interface IncomingCallModalProps {
   callerName: string;
@@ -9,6 +11,13 @@ interface IncomingCallModalProps {
 }
 
 export default function IncomingCallModal({ callerName, callerAvatar, isVideo, onAccept, onDecline }: IncomingCallModalProps) {
+  useEffect(() => {
+    toneGenerator?.playRingTone();
+    return () => {
+      toneGenerator?.stop();
+    };
+  }, []);
+
   return (
     <div className="fixed inset-0 z-[80] bg-background/90 backdrop-blur-xl flex flex-col items-center justify-center">
       {/* Avatar with pulse rings */}

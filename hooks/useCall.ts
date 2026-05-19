@@ -9,6 +9,7 @@ import { encryptMessage } from '@/lib/crypto/e2ee';
 import { getMyKeys } from '@/lib/crypto/keyManager';
 import { decodeBase64 } from 'tweetnacl-util';
 import type { CallSignal } from '@/types';
+import { toneGenerator } from '@/lib/audio/tones';
 
 // Singletons to preserve state and manager references across hook instances
 let activeManager: AgoraCallManager | null = null;
@@ -109,6 +110,7 @@ export function useCall() {
 
     callStartTime = null;
     
+    toneGenerator?.stop();
     resetCallState();
   }, [resetCallState]);
 
@@ -130,10 +132,13 @@ export function useCall() {
       const manager = new AgoraCallManager(couple.id, user.id);
       activeManager = manager;
 
+      toneGenerator?.playDialingTone();
+
       const { localStream: stream } = await manager.startCall(
         video,
         (remoteMediaStream) => {
           console.log('[useCall] Remote stream received');
+          toneGenerator?.stop();
           setRemoteStream(remoteMediaStream);
           // Connected — clear auto-decline timeout
           if (activeTimeout) {

@@ -66,11 +66,28 @@ export default function ChatPage() {
             </span>
           </div>
         )}
-        <div className="flex flex-col">
+        <div className="flex flex-col flex-1">
            <span className="font-medium text-on-surface" style={{ fontFamily: 'var(--font-headline)' }}>{partner?.display_name || 'Partner'}</span>
            <span className="text-xs text-on-surface-variant">
              {partnerTyping ? 'Typing...' : partnerOnline ? 'Online' : 'Offline'}
            </span>
+        </div>
+        
+        {/* Call Buttons */}
+        <div className="flex items-center gap-1">
+          <Link href="/call" onClick={() => {
+            // we can trigger call from call page directly, or we can import useCall here. 
+            // The simplest way since they link to /call is to let the user start it there,
+            // OR we can import useCall in ChatPage and start directly.
+            // Wait, the prompt says "give call buttons". Since /call page already has start buttons,
+            // if we just link to /call, it works. But better if it starts immediately. Let's just navigate to /call and let the user click start for now, OR we can use the useCall hook.
+            // Let's import useCall. I'll need to modify the imports first.
+          }} className="w-10 h-10 rounded-full flex items-center justify-center text-primary hover:bg-primary/10 transition-colors">
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>call</span>
+          </Link>
+          <Link href="/call" className="w-10 h-10 rounded-full flex items-center justify-center text-primary hover:bg-primary/10 transition-colors">
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>videocam</span>
+          </Link>
         </div>
       </div>
       <ChatWindow 
