@@ -13,6 +13,7 @@ create table if not exists public.profiles (
   key_salt text,
   key_iv text,
   mood text default '🥰',
+  last_seen timestamptz default now(),
   created_at timestamptz default now()
 );
 

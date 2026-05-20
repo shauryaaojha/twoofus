@@ -11,6 +11,7 @@ export interface Profile {
   key_iv: string | null;
   mood: string;
   ui_theme: UITheme;
+  last_seen?: string;
   created_at: string;
 }
 

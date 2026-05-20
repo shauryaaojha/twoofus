@@ -16,8 +16,19 @@ export default function ChatPage() {
   const { couple, user, partner } = useAuthStore();
   const setPartnerTyping = useChatStore((s) => s.setPartnerTyping);
   const partnerTyping = useChatStore((s) => s.partnerTyping);
-  const { partnerOnline } = usePresence();
+  const { partnerOnline, partnerLastSeen } = usePresence();
   const typingChannelRef = useRef<ReturnType<ReturnType<typeof getSupabase>['channel']> | null>(null);
+
+  const formatLastSeen = (dateString?: string) => {
+    if (!dateString) return 'Offline';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    if (diff < 60000) return 'Just now';
+    if (diff < 3600000) return `Last seen ${Math.floor(diff / 60000)}m ago`;
+    if (diff < 86400000) return `Last seen ${Math.floor(diff / 3600000)}h ago`;
+    return `Last seen ${date.toLocaleDateString()}`;
+  };
 
   useEffect(() => {
     registerPushNotifications();
@@ -69,7 +80,7 @@ export default function ChatPage() {
         <div className="flex flex-col flex-1">
            <span className="font-medium text-on-surface" style={{ fontFamily: 'var(--font-headline)' }}>{partner?.display_name || 'Partner'}</span>
            <span className="text-xs text-on-surface-variant">
-             {partnerTyping ? 'Typing...' : partnerOnline ? 'Online' : 'Offline'}
+             {partnerTyping ? 'Typing...' : partnerOnline ? 'Online' : formatLastSeen(partnerLastSeen)}
            </span>
         </div>
         
