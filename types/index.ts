@@ -42,7 +42,7 @@ export interface Message {
   sender_id: string;
   ciphertext: string;
   nonce: string;
-  type: 'text' | 'photo' | 'reaction' | 'call';
+  type: 'text' | 'photo' | 'reaction' | 'call' | 'ai';
   reply_to: string | null;
   reaction: string | null;
   seen_at: string | null;

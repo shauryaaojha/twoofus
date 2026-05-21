@@ -180,9 +180,18 @@ export default function MessageBubble({ message, isMine }: { message: Message; i
     }
   };
 
+  const isAi = message.type === 'ai';
+  const alignClass = isAi ? 'items-start' : (isMine ? 'items-end' : 'items-start');
+  const bubbleRadius = isAi 
+    ? 'rounded-[20px] rounded-tl-md shadow-sm border border-primary/20' 
+    : (isMine ? 'rounded-[20px] rounded-br-md shadow-sm' : 'rounded-[20px] rounded-bl-md shadow-sm');
+  const bubbleStyle = isAi 
+    ? { background: 'linear-gradient(135deg, var(--color-surface-container-highest), var(--color-surface-variant))' } 
+    : (isMine ? themeTokens.myBubble : themeTokens.theirBubble);
+
   return (
-    <div id={`msg-${message.id}`} className={`flex flex-col relative group ${isMine ? 'items-end' : 'items-start'}`}>
-      <div className={`flex items-center gap-2 max-w-[75%] md:max-w-[60%]`}>
+    <div id={`msg-${message.id}`} className={`flex flex-col relative group ${alignClass}`}>
+      <div className={`flex items-center gap-2 ${isAi ? 'max-w-[85%] md:max-w-[75%]' : 'max-w-[75%] md:max-w-[60%]'}`}>
         {isMine && !isDeleted && (
           <button
             onClick={() => setMenuOpen(!menuOpen)}
@@ -194,12 +203,15 @@ export default function MessageBubble({ message, isMine }: { message: Message; i
         )}
 
         <div
-          className={`relative ${isMine
-            ? 'rounded-[20px] rounded-br-md shadow-sm'
-            : 'rounded-[20px] rounded-bl-md shadow-sm'
-            }`}
-          style={isMine ? themeTokens.myBubble : themeTokens.theirBubble}
+          className={`relative ${bubbleRadius}`}
+          style={bubbleStyle}
         >
+          {isAi && !isDeleted && (
+            <div className="flex items-center gap-1.5 mb-2 text-primary border-b border-primary/10 pb-1.5">
+              <span className="material-symbols-outlined text-[16px]">smart_toy</span>
+              <span className="text-[11px] font-bold tracking-wide uppercase">AI Assistant</span>
+            </div>
+          )}
           {isDeleted ? (
             <p className="italic text-on-surface-variant/60 text-sm">Message deleted</p>
           ) : (
@@ -230,7 +242,7 @@ export default function MessageBubble({ message, isMine }: { message: Message; i
                   </div>
                 </div>
               )}
-              {message.type === 'text' && (
+              {(message.type === 'text' || message.type === 'ai') && (
                 <p className="text-[16px] leading-[24px] break-words whitespace-pre-wrap" style={{ fontFamily: 'var(--font-body)' }}>
                   {message.plaintext || '[decryption failed]'}
                 </p>

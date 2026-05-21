@@ -61,6 +61,10 @@ export default function MessageInput() {
     if (!text.trim() || !couple?.id || !partner?.public_key || sending) return;
     setSending(true);
 
+    const messageText = text.trim();
+    const isAiRequest = messageText.toLowerCase().includes('@ai') || replyToMessage?.type === 'ai';
+    const repliedMessageText = (replyToMessage?.type === 'text' || replyToMessage?.type === 'ai') ? replyToMessage.plaintext : undefined;
+
     const keys = getMyKeys();
     if (!keys) { setSending(false); return; }
 
@@ -68,14 +72,14 @@ export default function MessageInput() {
     const { ciphertext, nonce } = encryptMessage(text.trim(), partnerPub, keys.secretKey);
 
     const supabase = getSupabase();
-    const { error: insertError } = await supabase.from('messages').insert({
+    const { data: insertedMessage, error: insertError } = await supabase.from('messages').insert({
       couple_id: couple.id,
       sender_id: user?.id,
       ciphertext,
       nonce,
       type: 'text',
       reply_to: replyToMessage?.id || null,
-    });
+    }).select('id').single();
 
     if (!insertError && partner?.id) {
       sendPushNotification(
@@ -89,6 +93,50 @@ export default function MessageInput() {
     setReplyToMessage(null);
     setSending(false);
     inputRef.current?.focus();
+
+    if (isAiRequest && insertedMessage) {
+      handleAiResponse(messageText, repliedMessageText, insertedMessage.id);
+    }
+  };
+
+  const handleAiResponse = async (promptText: string, contextText?: string, replyToId?: string) => {
+    try {
+      showToast('AI is thinking...', 'info');
+      const res = await fetch('/api/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: promptText, context: contextText }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'AI request failed');
+
+      const keys = getMyKeys();
+      if (!keys || !partner?.public_key || !couple?.id || !user?.id) return;
+
+      const partnerPub = decodeBase64(partner.public_key);
+      const { ciphertext, nonce } = encryptMessage(data.text, partnerPub, keys.secretKey);
+
+      const supabase = getSupabase();
+      await supabase.from('messages').insert({
+        couple_id: couple.id,
+        sender_id: user.id, // Using user's ID but type 'ai'
+        ciphertext,
+        nonce,
+        type: 'ai',
+        reply_to: replyToId || null,
+      });
+
+      if (partner?.id) {
+        sendPushNotification(
+          partner.id,
+          'AI Assistant',
+          'Replied in your chat'
+        );
+      }
+    } catch (err: any) {
+      console.error(err);
+      showToast(err.message || 'AI failed to respond', 'error');
+    }
   };
 
   const handleCameraClick = () => {
