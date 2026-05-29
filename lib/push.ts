@@ -1,6 +1,8 @@
+import { logger } from './utils/logger';
+
 export async function registerPushNotifications() {
   if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('PushManager' in window)) {
-    console.log('Push notifications not supported in this browser');
+    logger.info('Push notifications not supported in this browser');
     return;
   }
 
@@ -14,14 +16,14 @@ export async function registerPushNotifications() {
     }
 
     if (permission !== 'granted') {
-      console.log('Notification permission not granted:', permission);
+      logger.info('Notification permission not granted:', permission);
       return;
     }
 
     // Subscribe to push notifications
     const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
     if (!vapidPublicKey) {
-      console.warn('VAPID public key not set in environment variables');
+      logger.warn('VAPID public key not set in environment variables');
       return;
     }
 
@@ -50,9 +52,9 @@ export async function registerPushNotifications() {
       throw new Error(`Server returned ${res.status}`);
     }
 
-    console.log('Push subscription registered successfully');
+    logger.info('Push subscription registered successfully');
   } catch (err) {
-    console.error('Failed to register push subscription:', err);
+    logger.error('Failed to register push subscription:', err);
   }
 }
 
