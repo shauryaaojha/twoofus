@@ -2,6 +2,7 @@
 
 import type { Message } from '@/types';
 import { useRouter } from 'next/navigation';
+import { memo } from 'react';
 
 interface CallData {
   callType: 'voice' | 'video';
@@ -35,7 +36,7 @@ function formatDate(dateStr: string) {
   return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
 }
 
-export default function CallEventBubble({ message, isMine }: { message: Message; isMine: boolean }) {
+export default memo(function CallEventBubble({ message, isMine }: { message: Message; isMine: boolean }) {
   const router = useRouter();
 
   let callData: CallData | null = null;
@@ -143,4 +144,4 @@ export default function CallEventBubble({ message, isMine }: { message: Message;
       </div>
     </div>
   );
-}
+});

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import type { Message } from '@/types';
 import { getSupabase } from '@/lib/supabase/client';
 import { decryptFile, decryptSymmetricKey } from '@/lib/crypto/e2ee';
@@ -138,15 +138,16 @@ function E2EEImage({
   );
 }
 
-export default function MessageBubble({ message, isMine }: { message: Message; isMine: boolean }) {
+export default memo(function MessageBubble({ message, isMine }: { message: Message; isMine: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { partner, user } = useAuthStore();
-  const { show: showToast } = useToastStore();
-  const { setReplyToMessage, messages } = useChatStore();
+  const partner = useAuthStore((s) => s.partner);
+  const user = useAuthStore((s) => s.user);
+  const showToast = useToastStore((s) => s.show);
+  const setReplyToMessage = useChatStore((s) => s.setReplyToMessage);
   const currentChatTheme = useThemeStore((s) => s.chatTheme);
   const themeTokens = chatThemes[currentChatTheme] || chatThemes['soft-blush'];
 
-  const repliedMessage = message.reply_to ? messages.find((m) => m.id === message.reply_to) : null;
+  const repliedMessage = useChatStore((s) => message.reply_to ? s.messages.find((m) => m.id === message.reply_to) : null);
   const isDeleted = !!message.deleted_at;
 
   // Call events are rendered by CallEventBubble, not MessageBubble
@@ -351,4 +352,4 @@ export default function MessageBubble({ message, isMine }: { message: Message; i
       )}
     </div>
   );
-}
+});
