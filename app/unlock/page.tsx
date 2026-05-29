@@ -6,7 +6,14 @@ import { getSupabase } from '@/lib/supabase/client';
 import { clearAllKeys, fetchAndDecryptKeys, generateAndUploadKeys, hasSessionKeys } from '@/lib/crypto/keyManager';
 import { useAuthStore } from '@/lib/store/authStore';
 
-const OTPInput = ({ value, onChange, disabled, autoFocus }: { value: string, onChange: (val: string) => void, disabled?: boolean, autoFocus?: boolean }) => {
+interface OTPInputProps {
+  value: string;
+  onChange: (val: string) => void;
+  disabled?: boolean;
+  autoFocus?: boolean;
+}
+
+const OTPInput = ({ value, onChange, disabled, autoFocus }: OTPInputProps) => {
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
