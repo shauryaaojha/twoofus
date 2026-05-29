@@ -8,14 +8,16 @@ import { chatThemes } from '@/lib/themes/chatThemes';
 import MessageBubble from './MessageBubble';
 import CallEventBubble from './CallEventBubble';
 import TypingIndicator from './TypingIndicator';
+import { formatDateLabel } from '@/lib/utils/date';
 
 interface ChatWindowProps {
   loadMoreMessages?: () => Promise<void>;
   hasMoreMessages?: boolean;
   isLoadingMore?: boolean;
+  searchQuery?: string;
 }
 
-export default function ChatWindow({ loadMoreMessages, hasMoreMessages, isLoadingMore }: ChatWindowProps) {
+export default function ChatWindow({ loadMoreMessages, hasMoreMessages, isLoadingMore, searchQuery = '' }: ChatWindowProps) {
   const { messages } = useChatStore();
   const { partnerTyping } = useChatStore();
   const { user } = useAuthStore();
@@ -111,11 +113,29 @@ export default function ChatWindow({ loadMoreMessages, hasMoreMessages, isLoadin
           </div>
         )}
 
-        {messages.map((msg) => {
-          if (msg.type === 'call') {
-            return <CallEventBubble key={msg.id} message={msg} isMine={msg.sender_id === user?.id} />;
-          }
-          return <MessageBubble key={msg.id} message={msg} isMine={msg.sender_id === user?.id} />;
+        {messages.filter((msg) => {
+          if (!searchQuery) return true;
+          if (msg.type !== 'text') return false;
+          return msg.plaintext?.toLowerCase().includes(searchQuery.toLowerCase());
+        }).map((msg, index, filteredMessages) => {
+          const showDateLabel = index === 0 || formatDateLabel(msg.created_at) !== formatDateLabel(filteredMessages[index - 1].created_at);
+
+          return (
+            <div key={`wrapper-${msg.id}`} className="flex flex-col gap-3">
+              {showDateLabel && (
+                <div className="flex justify-center my-2">
+                  <span className="bg-surface-variant/50 text-on-surface-variant text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm shadow-sm border border-outline-variant/20">
+                    {formatDateLabel(msg.created_at)}
+                  </span>
+                </div>
+              )}
+              {msg.type === 'call' ? (
+                <CallEventBubble key={msg.id} message={msg} isMine={msg.sender_id === user?.id} />
+              ) : (
+                <MessageBubble key={msg.id} message={msg} isMine={msg.sender_id === user?.id} />
+              )}
+            </div>
+          );
         })}
         {partnerTyping && <TypingIndicator />}
         <div ref={endRef} />

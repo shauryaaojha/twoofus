@@ -70,7 +70,7 @@ export class ToneGenerator {
     const playCycle = () => {
       if (!this.isPlaying || !this.ctx || !this.gainNode) return;
 
-      let time = this.ctx.currentTime;
+      const time = this.ctx.currentTime;
       
       // Play a quick sequence of notes: C5, E5, G5, C6
       const notes = [523.25, 659.25, 783.99, 1046.50];

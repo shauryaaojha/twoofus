@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ChatWindow from '@/components/chat/ChatWindow';
 import MessageInput from '@/components/chat/MessageInput';
 import { useRealtimeMessages } from '@/hooks/useRealtimeMessages';
@@ -18,6 +18,9 @@ export default function ChatPage() {
   const partnerTyping = useChatStore((s) => s.partnerTyping);
   const { partnerOnline, partnerLastSeen } = usePresence();
   const typingChannelRef = useRef<ReturnType<ReturnType<typeof getSupabase>['channel']> | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
 
   const formatLastSeen = (dateString?: string) => {
     if (!dateString) return 'Offline';
@@ -84,8 +87,29 @@ export default function ChatPage() {
            </span>
         </div>
         
+
         {/* Call Buttons */}
         <div className="flex items-center gap-1">
+          {isSearching ? (
+            <div className="flex items-center bg-surface-variant/50 rounded-full px-3 py-1">
+              <input
+                type="text"
+                autoFocus
+                placeholder="Search messages..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="bg-transparent border-none outline-none text-sm w-32 md:w-48 text-on-surface placeholder:text-on-surface-variant/50"
+              />
+              <button onClick={() => { setIsSearching(false); setSearchQuery(''); }} className="ml-1 text-on-surface-variant hover:text-on-surface">
+                <span className="material-symbols-outlined text-[18px]">close</span>
+              </button>
+            </div>
+          ) : (
+            <button onClick={() => setIsSearching(true)} className="w-10 h-10 rounded-full flex items-center justify-center text-primary hover:bg-primary/10 transition-colors">
+              <span className="material-symbols-outlined">search</span>
+            </button>
+          )}
+
           <Link href="/call" onClick={() => {
             // we can trigger call from call page directly, or we can import useCall here. 
             // The simplest way since they link to /call is to let the user start it there,
@@ -105,6 +129,7 @@ export default function ChatPage() {
         loadMoreMessages={loadMoreMessages} 
         hasMoreMessages={hasMoreMessages} 
         isLoadingMore={isLoadingMore} 
+        searchQuery={searchQuery}
       />
       <MessageInput />
     </div>
