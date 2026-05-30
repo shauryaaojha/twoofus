@@ -17,6 +17,17 @@ function formatTime(dateStr: string) {
   return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
+type PhotoMetadata = {
+  storagePath?: string;
+  encryptedKey?: string;
+  keyNonce?: string;
+  fileNonce?: string;
+};
+
+function getErrorMessage(err: unknown, fallback: string) {
+  return err instanceof Error ? err.message : fallback;
+}
+
 function E2EEImage({
   metadataStr,
   partnerPubKeyB64,
@@ -35,7 +46,7 @@ function E2EEImage({
 
     async function loadAndDecrypt() {
       try {
-        const metadata = JSON.parse(metadataStr);
+        const metadata = JSON.parse(metadataStr) as PhotoMetadata;
         const { storagePath, encryptedKey, keyNonce, fileNonce } = metadata;
 
         if (!storagePath || !encryptedKey || !keyNonce || !fileNonce) {
@@ -68,13 +79,13 @@ function E2EEImage({
         if (!decryptedBytes) throw new Error('Photo decryption failed');
 
         if (active) {
-          const blob = new Blob([decryptedBytes as any], { type: 'image/jpeg' });
+          const blob = new Blob([new Uint8Array(decryptedBytes)], { type: 'image/jpeg' });
           url = URL.createObjectURL(blob);
           setImageUrl(url);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error(err);
-        if (active) setError(err.message || 'Decryption failed');
+        if (active) setError(getErrorMessage(err, 'Decryption failed'));
       } finally {
         if (active) setLoading(false);
       }
@@ -109,6 +120,7 @@ function E2EEImage({
   return (
     <>
       <div className="mt-2 rounded-xl overflow-hidden cursor-pointer group relative shadow-md" onClick={() => setLightboxOpen(true)}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={imageUrl!}
           alt="Shared Secure Image"
@@ -124,6 +136,7 @@ function E2EEImage({
           className="fixed inset-0 bg-background/95 backdrop-blur-md z-50 flex items-center justify-center p-4 cursor-zoom-out animate-fade-in"
           onClick={() => setLightboxOpen(false)}
         >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={imageUrl!}
             alt="Zoomed Shared Image"
@@ -162,7 +175,7 @@ export default memo(function MessageBubble({ message, isMine }: { message: Messa
         .update({ reaction: newReaction })
         .eq('id', message.id);
       setMenuOpen(false);
-    } catch (err) {
+    } catch {
       showToast('Failed to send reaction', 'error');
     }
   };
@@ -176,7 +189,7 @@ export default memo(function MessageBubble({ message, isMine }: { message: Messa
         .eq('id', message.id);
       showToast('Message deleted', 'success');
       setMenuOpen(false);
-    } catch (err) {
+    } catch {
       showToast('Failed to delete message', 'error');
     }
   };
@@ -191,8 +204,8 @@ export default memo(function MessageBubble({ message, isMine }: { message: Messa
     : (isMine ? themeTokens.myBubble : themeTokens.theirBubble);
 
   return (
-    <div id={`msg-${message.id}`} className={`flex flex-col relative group ${alignClass}`}>
-      <div className={`flex items-center gap-2 ${isAi ? 'max-w-[85%] md:max-w-[75%]' : 'max-w-[75%] md:max-w-[60%]'}`}>
+    <div id={`msg-${message.id}`} className={`flex flex-col relative group w-full min-w-0 ${alignClass}`}>
+      <div className={`flex items-center gap-2 min-w-0 ${isAi ? 'max-w-[92%] md:max-w-[75%]' : 'max-w-[86%] md:max-w-[60%]'}`}>
         {isMine && !isDeleted && (
           <button
             onClick={() => setMenuOpen(!menuOpen)}
@@ -204,7 +217,7 @@ export default memo(function MessageBubble({ message, isMine }: { message: Messa
         )}
 
         <div
-          className={`relative ${bubbleRadius}`}
+          className={`relative min-w-0 max-w-full px-3.5 py-2.5 ${bubbleRadius}`}
           style={bubbleStyle}
         >
           {isAi && !isDeleted && (
@@ -227,12 +240,12 @@ export default memo(function MessageBubble({ message, isMine }: { message: Messa
                       setTimeout(() => targetEl.classList.remove('animate-pulse-quick'), 1000);
                     }
                   }}
-                  className="mb-2 cursor-pointer bg-surface-variant/20 hover:bg-surface-variant/40 rounded-xl px-3 py-1.5 border-l-2 border-primary/60 text-left transition-colors duration-200"
+                  className="mb-2 cursor-pointer bg-surface-variant/20 hover:bg-surface-variant/40 rounded-xl px-3 py-1.5 border-l-2 border-primary/60 text-left transition-colors duration-200 min-w-0 max-w-full overflow-hidden"
                 >
                   <div className="text-[11px] text-primary font-bold">
                     {repliedMessage.sender_id === user?.id ? 'You' : (partner?.display_name || 'Partner')}
                   </div>
-                  <div className="text-xs text-on-surface-variant/80 truncate mt-0.5 max-w-[200px]">
+                  <div className="text-xs text-on-surface-variant/80 truncate mt-0.5 max-w-full">
                     {repliedMessage.deleted_at ? (
                       <span className="italic text-xs text-on-surface-variant/50">Deleted message</span>
                     ) : repliedMessage.type === 'photo' ? (
@@ -244,7 +257,7 @@ export default memo(function MessageBubble({ message, isMine }: { message: Messa
                 </div>
               )}
               {(message.type === 'text' || message.type === 'ai') && (
-                <p className="text-[16px] leading-[24px] break-words whitespace-pre-wrap" style={{ fontFamily: 'var(--font-body)' }}>
+                <p className="text-[16px] leading-[24px] whitespace-pre-wrap [overflow-wrap:anywhere]" style={{ fontFamily: 'var(--font-body)' }}>
                   {message.plaintext || '[decryption failed]'}
                 </p>
               )}

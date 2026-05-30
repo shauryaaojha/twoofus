@@ -25,6 +25,7 @@ export default function BottomNav() {
           <Link
             key={item.href}
             href={item.href}
+            prefetch
             className={`flex flex-col items-center justify-center transition-all duration-300 ${
               isActive
                 ? 'text-primary drop-shadow-[0_0_8px_rgba(255,178,184,0.6)] scale-110'

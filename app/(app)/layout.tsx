@@ -10,6 +10,7 @@ import BottomNav from '@/components/shared/BottomNav';
 import LoadingScreen from '@/components/shared/LoadingScreen';
 import IncomingCallModal from '@/components/call/IncomingCallModal';
 import Toast from '@/components/shared/Toast';
+import RoutePreloader from '@/components/shared/RoutePreloader';
 import { useCall } from '@/hooks/useCall';
 import { useThemeInit } from '@/hooks/useTheme';
 
@@ -101,6 +102,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       {!isChatPage && <TopBar />}
+      <RoutePreloader />
       <main className={`pt-16 pb-[100px] md:pb-0 min-h-screen ${isChatPage ? '!pt-0 !pb-0' : ''}`}>{children}</main>
       {!isChatPage && <BottomNav />}
       <Toast />

@@ -10,12 +10,21 @@ import { usePhotoQuota } from '@/hooks/usePhotoQuota';
 import { useToastStore } from '@/lib/store/toastStore';
 import { useChatStore } from '@/lib/store/chatStore';
 
+type Heic2Any = (options: { blob: Blob; toType: string; quality: number }) => Promise<Blob | Blob[]>;
+type WindowWithHeic = Window & typeof globalThis & { heic2any?: Heic2Any };
+type AiResponse = { text?: string; error?: string };
+
+function getErrorMessage(err: unknown, fallback: string) {
+  return err instanceof Error ? err.message : fallback;
+}
+
 export default function MessageInput() {
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
+  const [showAiPicker, setShowAiPicker] = useState(false);
   const { couple, partner, user, profile } = useAuthStore();
   const { replyToMessage, setReplyToMessage } = useChatStore();
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -25,13 +34,21 @@ export default function MessageInput() {
 
   useEffect(() => {
     // Dynamically load heic2any to avoid Next.js Turbopack crash
-    if (typeof window !== 'undefined' && !window.heic2any) {
+    if (typeof window !== 'undefined' && !(window as WindowWithHeic).heic2any) {
       const script = document.createElement('script');
       script.src = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';
       script.async = true;
       document.body.appendChild(script);
     }
   }, []);
+
+  useEffect(() => {
+    const input = inputRef.current;
+    if (!input) return;
+
+    input.style.height = 'auto';
+    input.style.height = `${Math.min(input.scrollHeight, 128)}px`;
+  }, [text]);
 
   // Subscribe to typing channel once
   useEffect(() => {
@@ -55,6 +72,21 @@ export default function MessageInput() {
     typingTimeoutRef.current = setTimeout(() => {
       channelRef.current?.send({ type: 'broadcast', event: 'stop_typing', payload: { userId: user?.id } });
     }, 2000);
+  };
+
+  const updateText = (value: string) => {
+    setText(value);
+    setShowAiPicker(/(^|\s)@$/.test(value) || /(^|\s)@a?$/i.test(value));
+    sendTypingIndicator();
+  };
+
+  const insertAiMention = () => {
+    setText((current) => {
+      const next = current.replace(/(^|\s)@a?$/i, '$1@ai ');
+      return next === current ? `${current}@ai ` : next;
+    });
+    setShowAiPicker(false);
+    requestAnimationFrame(() => inputRef.current?.focus());
   };
 
   const handleSend = async () => {
@@ -107,8 +139,9 @@ export default function MessageInput() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: promptText, context: contextText }),
       });
-      const data = await res.json();
+      const data = (await res.json()) as AiResponse;
       if (!res.ok) throw new Error(data.error || 'AI request failed');
+      if (!data.text) throw new Error('AI returned an empty response');
 
       const keys = getMyKeys();
       if (!keys || !partner?.public_key || !couple?.id || !user?.id) return;
@@ -133,9 +166,9 @@ export default function MessageInput() {
           'Replied in your chat'
         );
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      showToast(err.message || 'AI failed to respond', 'error');
+      showToast(getErrorMessage(err, 'AI failed to respond'), 'error');
     }
   };
 
@@ -165,7 +198,7 @@ export default function MessageInput() {
       // Handle HEIC/HEIF conversion
       if (file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif') || file.type === 'image/heic' || file.type === 'image/heif') {
         showToast('Converting HEIC image...', 'info');
-        const heic2any = window.heic2any;
+        const heic2any = (window as WindowWithHeic).heic2any;
         if (!heic2any) throw new Error('HEIC converter not loaded yet. Please try again in a moment.');
 
         const convertedBlob = await heic2any({
@@ -259,9 +292,9 @@ export default function MessageInput() {
 
       setReplyToMessage(null);
       showToast(`Photo shared! (${remaining - 1} remaining today)`, 'success');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      showToast(err.message || 'Failed to upload photo', 'error');
+      showToast(getErrorMessage(err, 'Failed to upload photo'), 'error');
     } finally {
       setSending(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -323,15 +356,34 @@ export default function MessageInput() {
           className="hidden"
           onChange={handlePhotoUpload}
         />
-        <div className="flex-1 relative">
-          <input
+        <div className="flex-1 relative min-w-0">
+          {showAiPicker && (
+            <button
+              type="button"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                insertAiMention();
+              }}
+              className="absolute bottom-full left-0 mb-2 flex w-full max-w-[220px] items-center gap-2 rounded-2xl border border-primary/20 bg-surface-container-high/95 px-3 py-2 text-left shadow-xl backdrop-blur-xl"
+            >
+              <span className="material-symbols-outlined text-[18px] text-primary">smart_toy</span>
+              <span className="text-sm font-semibold text-on-surface">AI Assistant</span>
+              <span className="ml-auto text-xs text-primary">@ai</span>
+            </button>
+          )}
+          <textarea
             ref={inputRef}
-            type="text"
             value={text}
-            onChange={(e) => { setText(e.target.value); sendTypingIndicator(); }}
-            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+            rows={1}
+            onChange={(e) => updateText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
             placeholder="Type a message..."
-            className="w-full bg-surface-variant/30 text-on-surface rounded-full px-5 py-3 text-base outline-none border border-outline-variant/20 focus:border-primary/50 transition-colors placeholder:text-outline"
+            className="max-h-32 min-h-12 w-full resize-none rounded-3xl border border-outline-variant/20 bg-surface-variant/30 px-5 py-3 text-base leading-6 text-on-surface outline-none transition-colors placeholder:text-outline focus:border-primary/50"
             style={{ fontFamily: 'var(--font-body)' }}
           />
         </div>
