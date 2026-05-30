@@ -9,6 +9,7 @@ import { encryptMessage } from '@/lib/crypto/e2ee';
 import { getMyKeys } from '@/lib/crypto/keyManager';
 import { decodeBase64 } from 'tweetnacl-util';
 import type { CallSignal } from '@/types';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 import { toneGenerator } from '@/lib/audio/tones';
 import { logger } from '@/lib/utils/logger';
 
@@ -16,7 +17,7 @@ import { logger } from '@/lib/utils/logger';
 let activeManager: AgoraCallManager | null = null;
 let activeTimer: NodeJS.Timeout | null = null;
 let activeTimeout: NodeJS.Timeout | null = null;
-let activeChannel: any = null;
+let activeChannel: RealtimeChannel | null = null;
 let activeChannelCreatorHookId: string | null = null;
 let callStartTime: number | null = null;
 let callIsVideo: boolean = false;
