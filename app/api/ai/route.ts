@@ -40,28 +40,37 @@ export async function POST(req: Request) {
       content: prompt
     });
 
-    const MODEL = 'llama-3.3-70b-versatile';
+    const MODELS = [
+      'llama-3.3-70b-versatile',
+      'llama-3.1-8b-instant',
+      'mixtral-8x7b-32768'
+    ];
 
     let responseText = null;
     let lastError: any = null;
 
-    try {
-      const completion = await groq.chat.completions.create({
-        messages,
-        model: MODEL,
-        temperature: 0.7,
-        max_tokens: 1024,
-      });
+    for (const model of MODELS) {
+      try {
+        const completion = await groq.chat.completions.create({
+          messages,
+          model,
+          temperature: 0.7,
+          max_tokens: 1024,
+        });
 
-      if (completion.choices[0]?.message?.content) {
-        responseText = completion.choices[0].message.content;
-      }
-    } catch (error: any) {
-      console.warn(`Groq model ${MODEL} failed:`, error.message);
-      lastError = error;
+        if (completion.choices[0]?.message?.content) {
+          responseText = completion.choices[0].message.content;
+          break; // Successfully generated, exit loop
+        }
+      } catch (error: any) {
+        console.warn(`Groq model ${model} failed:`, error.message);
+        lastError = error;
 
-      if (error.status === 401) {
-        throw new Error('Invalid Groq API Key. Please check your configuration.');
+        // If the API key is invalid, there is no point trying other models
+        if (error.status === 401) {
+          throw new Error('Invalid Groq API Key. Please check your configuration.');
+        }
+        // For 429 (Rate Limit / Quota Exceeded) or 500/503, we continue to the next model
       }
     }
 
