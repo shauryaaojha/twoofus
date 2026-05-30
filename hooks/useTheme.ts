@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useThemeStore } from '@/lib/store/themeStore';
 import { useAuthStore } from '@/lib/store/authStore';
 import { getSupabase } from '@/lib/supabase/client';
-import type { UITheme, ChatTheme } from '@/types';
+import type { UITheme, ChatTheme, Couple } from '@/types';
 
 /**
  * Hook that initializes theme from the user's profile and couple data,
@@ -51,16 +51,21 @@ export function useThemeInit() {
                     filter: `id=eq.${couple.id}`,
                 },
                 (payload) => {
-                    const updatedCouple = payload.new;
+                    const updatedCouple = payload.new as Partial<Couple>;
+                    const currentCouple = useAuthStore.getState().couple;
 
                     if (updatedCouple.chat_theme && updatedCouple.chat_theme !== useThemeStore.getState().chatTheme) {
                         setChatTheme(updatedCouple.chat_theme);
-                        useAuthStore.getState().setCouple({ ...useAuthStore.getState().couple, chat_theme: updatedCouple.chat_theme } as any);
+                        if (currentCouple) {
+                            useAuthStore.getState().setCouple({ ...currentCouple, chat_theme: updatedCouple.chat_theme });
+                        }
                     }
 
                     if (updatedCouple.chat_bg_url !== undefined && updatedCouple.chat_bg_url !== useThemeStore.getState().chatBgUrl) {
                         setChatBgUrl(updatedCouple.chat_bg_url);
-                        useAuthStore.getState().setCouple({ ...useAuthStore.getState().couple, chat_bg_url: updatedCouple.chat_bg_url } as any);
+                        if (currentCouple) {
+                            useAuthStore.getState().setCouple({ ...currentCouple, chat_bg_url: updatedCouple.chat_bg_url });
+                        }
                     }
                 }
             )
