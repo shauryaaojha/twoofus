@@ -1,4 +1,5 @@
 import { getSupabase } from '@/lib/supabase/client';
+import { logger } from '@/lib/utils/logger';
 
 const APP_ID = process.env.NEXT_PUBLIC_AGORA_APP_ID!;
 
@@ -37,28 +38,28 @@ export class AgoraCallManager {
 
     this.client.on('user-published', async (user: any, mediaType: 'audio' | 'video') => {
       if (this.isDestroyed) return;
-      console.log('[AgoraCallManager] Remote user published:', user.uid, mediaType);
+      logger.debug('[AgoraCallManager] Remote user published:', user.uid, mediaType);
 
       await this.client.subscribe(user, mediaType);
-      console.log('[AgoraCallManager] Subscribed to remote', mediaType);
+      logger.debug('[AgoraCallManager] Subscribed to remote', mediaType);
 
       // Build a combined MediaStream from all available remote tracks
       this.emitRemoteStream(user);
     });
 
     this.client.on('user-unpublished', (user: any, mediaType: 'audio' | 'video') => {
-      console.log('[AgoraCallManager] Remote user unpublished:', user.uid, mediaType);
+      logger.debug('[AgoraCallManager] Remote user unpublished:', user.uid, mediaType);
       // Re-emit with remaining tracks
       this.emitRemoteStream(user);
     });
 
     this.client.on('user-left', (user: any) => {
-      console.log('[AgoraCallManager] Remote user left:', user.uid);
+      logger.debug('[AgoraCallManager] Remote user left:', user.uid);
       this.onRemoteLeft?.();
     });
 
     this.client.on('connection-state-change', (curState: string, prevState: string) => {
-      console.log('[AgoraCallManager] Connection state:', prevState, '->', curState);
+      logger.debug('[AgoraCallManager] Connection state:', prevState, '->', curState);
     });
   }
 
@@ -127,7 +128,7 @@ export class AgoraCallManager {
     const AgoraRTC = await this.initClient();
 
     const channelName = this.getChannelName();
-    console.log('[AgoraCallManager] Starting call, channel:', channelName);
+    logger.debug('[AgoraCallManager] Starting call, channel:', channelName);
 
     // Fetch token from our Edge Function
     const token = await this.fetchToken(channelName);
@@ -146,12 +147,12 @@ export class AgoraCallManager {
 
     // Join the channel
     await this.client.join(APP_ID, channelName, token, 0);
-    console.log('[AgoraCallManager] Joined channel');
+    logger.debug('[AgoraCallManager] Joined channel');
 
     // Publish local tracks
     const tracksToPublish = [this.localAudioTrack, this.localVideoTrack].filter(Boolean);
     await this.client.publish(tracksToPublish);
-    console.log('[AgoraCallManager] Published local tracks');
+    logger.debug('[AgoraCallManager] Published local tracks');
 
     // Build local MediaStream for preview
     const localMediaTracks: MediaStreamTrack[] = [];
@@ -193,9 +194,9 @@ export class AgoraCallManager {
       const currentLabel = this.localVideoTrack.getMediaStreamTrack().label;
       const nextDevice = devices.find((d: any) => d.label !== currentLabel) || devices[0];
       await this.localVideoTrack.setDevice(nextDevice.deviceId);
-      console.log('[AgoraCallManager] Switched camera to:', nextDevice.label);
+      logger.debug('[AgoraCallManager] Switched camera to:', nextDevice.label);
     } catch (e) {
-      console.warn('[AgoraCallManager] Camera switch failed:', e);
+      logger.warn('[AgoraCallManager] Camera switch failed:', e);
     }
   }
 
@@ -203,7 +204,7 @@ export class AgoraCallManager {
     if (this.isDestroyed) return;
     this.isDestroyed = true;
 
-    console.log('[AgoraCallManager] Ending call');
+    logger.debug('[AgoraCallManager] Ending call');
 
     // Stop and close local tracks
     if (this.localAudioTrack) {
@@ -222,7 +223,7 @@ export class AgoraCallManager {
       try {
         await this.client.leave();
       } catch (e) {
-        console.warn('[AgoraCallManager] Error leaving channel:', e);
+        logger.warn('[AgoraCallManager] Error leaving channel:', e);
       }
     }
 
