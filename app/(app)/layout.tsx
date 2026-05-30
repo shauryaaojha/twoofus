@@ -57,20 +57,22 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Fetch profile and couple concurrently
-      const [profileResult, coupleResult] = await Promise.all([
-        supabase.from('profiles').select('*').eq('id', authUser.id).maybeSingle(),
-        supabase.from('couples').select('*').or(`user_a.eq.${authUser.id},user_b.eq.${authUser.id}`).eq('status', 'active').maybeSingle()
-      ]);
-
-      const { data: profile } = profileResult;
+      // Fetch profile
+      const { data: profile } = await supabase
+        .from('profiles').select('*').eq('id', authUser.id).maybeSingle();
       if (!profile) {
         await resetStaleSession();
         return;
       }
       setProfile(profile);
 
-      const { data: couple } = coupleResult;
+      // Fetch couple (can be active or pending)
+      const { data: couple } = await supabase
+        .from('couples')
+        .select('*')
+        .or(`user_a.eq.${authUser.id},user_b.eq.${authUser.id}`)
+        .eq('status', 'active')
+        .single();
 
       if (couple) {
         setCouple(couple);

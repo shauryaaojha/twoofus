@@ -6,14 +6,7 @@ import { getSupabase } from '@/lib/supabase/client';
 import { clearAllKeys, fetchAndDecryptKeys, generateAndUploadKeys, hasSessionKeys } from '@/lib/crypto/keyManager';
 import { useAuthStore } from '@/lib/store/authStore';
 
-interface OTPInputProps {
-  value: string;
-  onChange: (val: string) => void;
-  disabled?: boolean;
-  autoFocus?: boolean;
-}
-
-const OTPInput = ({ value, onChange, disabled, autoFocus }: OTPInputProps) => {
+const OTPInput = ({ value, onChange, disabled, autoFocus }: { value: string, onChange: (val: string) => void, disabled?: boolean, autoFocus?: boolean }) => {
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
@@ -98,32 +91,19 @@ export default function UnlockPage() {
   useEffect(() => {
     const checkState = async () => {
       const supabase = getSupabase();
-
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) {
-        clearAllKeys();
-        router.push('/login');
-        return;
-      }
-
-      const [
-        { data: { user } },
-        { data: profile }
-      ] = await Promise.all([
-        supabase.auth.getUser(),
-        supabase
-          .from('profiles')
-          .select('encrypted_private_key')
-          .eq('id', session.user.id)
-          .maybeSingle()
-      ]);
-
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         clearAllKeys();
         router.push('/login');
         return;
       }
       setUser({ id: user.id, email: user.email || '' });
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('encrypted_private_key')
+        .eq('id', user.id)
+        .maybeSingle();
 
       if (!profile) {
         clearAllKeys();

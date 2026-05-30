@@ -10,9 +10,7 @@ interface IncomingCallModalProps {
   onDecline: () => void;
 }
 
-export default function IncomingCallModal(props: IncomingCallModalProps) {
-  const { callerName, callerAvatar, isVideo, onAccept, onDecline } = props;
-
+export default function IncomingCallModal({ callerName, callerAvatar, isVideo, onAccept, onDecline }: IncomingCallModalProps) {
   useEffect(() => {
     toneGenerator?.playRingTone();
     return () => {
