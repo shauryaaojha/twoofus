@@ -25,7 +25,7 @@ export default function MessageInput() {
 
   useEffect(() => {
     // Dynamically load heic2any to avoid Next.js Turbopack crash
-    if (typeof window !== 'undefined' && !(window as any).heic2any) {
+    if (typeof window !== 'undefined' && !window.heic2any) {
       const script = document.createElement('script');
       script.src = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';
       script.async = true;
@@ -165,7 +165,7 @@ export default function MessageInput() {
       // Handle HEIC/HEIF conversion
       if (file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif') || file.type === 'image/heic' || file.type === 'image/heif') {
         showToast('Converting HEIC image...', 'info');
-        const heic2any = (window as any).heic2any;
+        const heic2any = window.heic2any;
         if (!heic2any) throw new Error('HEIC converter not loaded yet. Please try again in a moment.');
 
         const convertedBlob = await heic2any({
