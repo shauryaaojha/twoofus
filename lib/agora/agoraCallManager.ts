@@ -1,4 +1,11 @@
 import { getSupabase } from '@/lib/supabase/client';
+import type {
+  IAgoraRTCClient,
+  IMicrophoneAudioTrack,
+  ICameraVideoTrack,
+  IAgoraRTCRemoteUser,
+  ILocalTrack,
+} from 'agora-rtc-sdk-ng';
 
 const APP_ID = process.env.NEXT_PUBLIC_AGORA_APP_ID!;
 
@@ -11,9 +18,9 @@ async function getAgoraRTC() {
 }
 
 export class AgoraCallManager {
-  private client: any = null; // IAgoraRTCClient - typed as any to allow lazy init
-  private localAudioTrack: any = null;
-  private localVideoTrack: any = null;
+  private client: IAgoraRTCClient | null = null;
+  private localAudioTrack: IMicrophoneAudioTrack | null = null;
+  private localVideoTrack: ICameraVideoTrack | null = null;
   private coupleId: string;
   private myId: string;
   private isDestroyed = false;
@@ -35,24 +42,24 @@ export class AgoraCallManager {
   private setupEventListeners() {
     if (!this.client) return;
 
-    this.client.on('user-published', async (user: any, mediaType: 'audio' | 'video') => {
+    this.client.on('user-published', async (user: IAgoraRTCRemoteUser, mediaType: 'audio' | 'video') => {
       if (this.isDestroyed) return;
       console.log('[AgoraCallManager] Remote user published:', user.uid, mediaType);
 
-      await this.client.subscribe(user, mediaType);
+      await this.client!.subscribe(user, mediaType);
       console.log('[AgoraCallManager] Subscribed to remote', mediaType);
 
       // Build a combined MediaStream from all available remote tracks
       this.emitRemoteStream(user);
     });
 
-    this.client.on('user-unpublished', (user: any, mediaType: 'audio' | 'video') => {
+    this.client.on('user-unpublished', (user: IAgoraRTCRemoteUser, mediaType: 'audio' | 'video') => {
       console.log('[AgoraCallManager] Remote user unpublished:', user.uid, mediaType);
       // Re-emit with remaining tracks
       this.emitRemoteStream(user);
     });
 
-    this.client.on('user-left', (user: any) => {
+    this.client.on('user-left', (user: IAgoraRTCRemoteUser) => {
       console.log('[AgoraCallManager] Remote user left:', user.uid);
       this.onRemoteLeft?.();
     });
@@ -62,7 +69,7 @@ export class AgoraCallManager {
     });
   }
 
-  private emitRemoteStream(user: any) {
+  private emitRemoteStream(user: IAgoraRTCRemoteUser) {
     if (!this.onRemoteStream) return;
 
     const tracks: MediaStreamTrack[] = [];
@@ -145,12 +152,12 @@ export class AgoraCallManager {
     }
 
     // Join the channel
-    await this.client.join(APP_ID, channelName, token, 0);
+    await this.client!.join(APP_ID, channelName, token, 0);
     console.log('[AgoraCallManager] Joined channel');
 
     // Publish local tracks
-    const tracksToPublish = [this.localAudioTrack, this.localVideoTrack].filter(Boolean);
-    await this.client.publish(tracksToPublish);
+    const tracksToPublish = [this.localAudioTrack, this.localVideoTrack].filter((t) => t !== null) as ILocalTrack[];
+    await this.client!.publish(tracksToPublish);
     console.log('[AgoraCallManager] Published local tracks');
 
     // Build local MediaStream for preview
@@ -191,7 +198,7 @@ export class AgoraCallManager {
       if (devices.length < 2) return;
 
       const currentLabel = this.localVideoTrack.getMediaStreamTrack().label;
-      const nextDevice = devices.find((d: any) => d.label !== currentLabel) || devices[0];
+      const nextDevice = devices.find((d: MediaDeviceInfo) => d.label !== currentLabel) || devices[0];
       await this.localVideoTrack.setDevice(nextDevice.deviceId);
       console.log('[AgoraCallManager] Switched camera to:', nextDevice.label);
     } catch (e) {
