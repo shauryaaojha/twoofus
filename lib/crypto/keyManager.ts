@@ -11,6 +11,7 @@
  *   Logout  → clear localStorage + sessionStorage
  */
 
+import { SupabaseClient } from '@supabase/supabase-js';
 import nacl from 'tweetnacl';
 import { encodeBase64, decodeBase64 } from 'tweetnacl-util';
 import { encryptPrivateKey, decryptPrivateKey, reEncryptWithCachedKey, clearCachedAesKey } from './keyVault';
@@ -25,8 +26,7 @@ const PUBLIC_KEY_STORAGE = 'twoofus_public_key';
  * password, and upload to Supabase. Cache the decrypted key locally.
  */
 export async function generateAndUploadKeys(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  supabase: any,
+  supabase: SupabaseClient,
   userId: string,
   password: string,
 ): Promise<string> {
@@ -58,8 +58,7 @@ export async function generateAndUploadKeys(
  * and cache locally. Called on login.
  */
 export async function fetchAndDecryptKeys(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  supabase: any,
+  supabase: SupabaseClient,
   userId: string,
   password: string,
 ): Promise<boolean> {
@@ -96,8 +95,7 @@ export async function fetchAndDecryptKeys(
  * (so user doesn't re-enter password). Falls back to password prompt.
  */
 export async function rotateKeysForNewRelationship(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  supabase: any,
+  supabase: SupabaseClient,
   userId: string,
   password?: string,
 ): Promise<string | null> {
