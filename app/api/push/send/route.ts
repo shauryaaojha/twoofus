@@ -12,6 +12,35 @@ export async function POST(request: Request) {
 
     const supabase = await createClient();
 
+    // Authentication and Authorization Check
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Concurrently validate user and check if they are authorized to send to this userId
+    const [authResult, coupleResult] = await Promise.all([
+      supabase.auth.getUser(),
+      supabase
+        .from('couples')
+        .select('user_a, user_b')
+        .or(`user_a.eq.${session.user.id},user_b.eq.${session.user.id}`)
+        .eq('status', 'active')
+        .maybeSingle()
+    ]);
+
+    if (!authResult.data.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    if (authResult.data.user.id !== userId) {
+      const couple = coupleResult.data;
+      if (!couple || (couple.user_a !== userId && couple.user_b !== userId)) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+    }
+
     // Fetch recipient's push subscription
     const { data: subData, error: subError } = await supabase
       .from('push_subscriptions')
