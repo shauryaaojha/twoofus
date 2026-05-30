@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useState, useCallback, useLayoutEffect } from 'react';
+import { useRef, useEffect, useState, useCallback, useLayoutEffect, useMemo } from 'react';
 import { useChatStore } from '@/lib/store/chatStore';
 import { useAuthStore } from '@/lib/store/authStore';
 import { useThemeStore } from '@/lib/store/themeStore';
@@ -87,6 +87,45 @@ export default function ChatWindow({ loadMoreMessages, hasMoreMessages, isLoadin
     }
   }, [loadMoreMessages, isLoadingMore, hasMoreMessages]);
 
+  const renderedMessages = useMemo(() => {
+    const lowerSearchQuery = searchQuery ? searchQuery.toLowerCase() : '';
+    let lastValidMsg: typeof messages[0] | null = null;
+    let lastDateLabel: string | null = null;
+
+    return messages.reduce<React.ReactNode[]>((acc, msg) => {
+      if (lowerSearchQuery) {
+        if (msg.type !== 'text') return acc;
+        const text = msg.plaintext;
+        if (!text || !text.toLowerCase().includes(lowerSearchQuery)) return acc;
+      }
+
+      const currentDateLabel = formatDateLabel(msg.created_at);
+      const showDateLabel = !lastValidMsg || currentDateLabel !== lastDateLabel;
+
+      lastValidMsg = msg;
+      lastDateLabel = currentDateLabel;
+
+      acc.push(
+        <div key={`wrapper-${msg.id}`} className="flex flex-col gap-3">
+          {showDateLabel && (
+            <div className="flex justify-center my-2">
+              <span className="bg-surface-variant/50 text-on-surface-variant text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm shadow-sm border border-outline-variant/20">
+                {currentDateLabel}
+              </span>
+            </div>
+          )}
+          {msg.type === 'call' ? (
+            <CallEventBubble key={msg.id} message={msg} isMine={msg.sender_id === user?.id} />
+          ) : (
+            <MessageBubble key={msg.id} message={msg} isMine={msg.sender_id === user?.id} />
+          )}
+        </div>
+      );
+
+      return acc;
+    }, []);
+  }, [messages, searchQuery, user?.id]);
+
   return (
     <div
       className="flex-1 overflow-y-auto px-5 py-4 hide-scrollbar transition-all duration-300"
@@ -113,30 +152,7 @@ export default function ChatWindow({ loadMoreMessages, hasMoreMessages, isLoadin
           </div>
         )}
 
-        {messages.filter((msg) => {
-          if (!searchQuery) return true;
-          if (msg.type !== 'text') return false;
-          return msg.plaintext?.toLowerCase().includes(searchQuery.toLowerCase());
-        }).map((msg, index, filteredMessages) => {
-          const showDateLabel = index === 0 || formatDateLabel(msg.created_at) !== formatDateLabel(filteredMessages[index - 1].created_at);
-
-          return (
-            <div key={`wrapper-${msg.id}`} className="flex flex-col gap-3">
-              {showDateLabel && (
-                <div className="flex justify-center my-2">
-                  <span className="bg-surface-variant/50 text-on-surface-variant text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm shadow-sm border border-outline-variant/20">
-                    {formatDateLabel(msg.created_at)}
-                  </span>
-                </div>
-              )}
-              {msg.type === 'call' ? (
-                <CallEventBubble key={msg.id} message={msg} isMine={msg.sender_id === user?.id} />
-              ) : (
-                <MessageBubble key={msg.id} message={msg} isMine={msg.sender_id === user?.id} />
-              )}
-            </div>
-          );
-        })}
+        {renderedMessages}
         {partnerTyping && <TypingIndicator />}
         <div ref={endRef} />
       </div>
