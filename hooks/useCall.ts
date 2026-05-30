@@ -10,6 +10,7 @@ import { getMyKeys } from '@/lib/crypto/keyManager';
 import { decodeBase64 } from 'tweetnacl-util';
 import type { CallSignal } from '@/types';
 import { toneGenerator } from '@/lib/audio/tones';
+import { logger } from '@/lib/utils/logger';
 
 // Singletons to preserve state and manager references across hook instances
 let activeManager: AgoraCallManager | null = null;
@@ -49,7 +50,7 @@ async function insertCallMessage(
   const keys = getMyKeys();
   
   if (!keys || !partner?.public_key) {
-    console.warn('[useCall] Cannot insert call message — keys or partner not available');
+    logger.warn('[useCall] Cannot insert call message — keys or partner not available');
     return;
   }
 
@@ -66,7 +67,7 @@ async function insertCallMessage(
   });
 
   if (error) {
-    console.error('[useCall] Failed to insert call message:', error);
+    logger.error('[useCall] Failed to insert call message:', error);
   }
 }
 
@@ -119,7 +120,7 @@ export function useCall() {
     
     // Prevent placing a new call if a call is already ongoing
     if (useCallStore.getState().isInCall) {
-      console.warn('[useCall] Call already ongoing, ignoring startCall');
+      logger.warn('[useCall] Call already ongoing, ignoring startCall');
       return;
     }
     
@@ -137,7 +138,7 @@ export function useCall() {
       const { localStream: stream } = await manager.startCall(
         video,
         (remoteMediaStream) => {
-          console.log('[useCall] Remote stream received');
+          logger.debug('[useCall] Remote stream received');
           toneGenerator?.stop();
           setRemoteStream(remoteMediaStream);
           // Connected — clear auto-decline timeout
@@ -148,7 +149,7 @@ export function useCall() {
         },
         () => {
           // Remote user left — end the call
-          console.log('[useCall] Remote user left, ending call');
+          logger.debug('[useCall] Remote user left, ending call');
           endCallInternal();
         }
       );
@@ -195,7 +196,7 @@ export function useCall() {
         }
       }, 60000);
     } catch (err) {
-      console.error('[useCall] Failed to start call:', err);
+      logger.error('[useCall] Failed to start call:', err);
       setIsInCall(false);
       setLocalStream(null);
       activeManager?.destroy();
@@ -212,7 +213,7 @@ export function useCall() {
     
     // Prevent answering if a call is already ongoing
     if (useCallStore.getState().isInCall) {
-      console.warn('[useCall] Call already ongoing, ignoring answerCall');
+      logger.warn('[useCall] Call already ongoing, ignoring answerCall');
       return;
     }
 
@@ -229,11 +230,11 @@ export function useCall() {
       const { localStream: stream } = await manager.startCall(
         video,
         (remoteMediaStream) => {
-          console.log('[useCall] Remote stream received in answerCall');
+          logger.debug('[useCall] Remote stream received in answerCall');
           setRemoteStream(remoteMediaStream);
         },
         () => {
-          console.log('[useCall] Remote user left, ending call');
+          logger.debug('[useCall] Remote user left, ending call');
           endCallInternal();
         }
       );
@@ -261,7 +262,7 @@ export function useCall() {
         setCallDuration((d) => d + 1);
       }, 1000);
     } catch (err) {
-      console.error('[useCall] Failed to answer call:', err);
+      logger.error('[useCall] Failed to answer call:', err);
       setIsInCall(false);
       setLocalStream(null);
       activeManager?.destroy();
@@ -340,14 +341,14 @@ export function useCall() {
     
     // If a channel is already active, do not subscribe again
     if (activeChannel) {
-      console.log(`[useCall] Realtime call signal channel already active, hook ${hookId.current} skipping`);
+      logger.debug(`[useCall] Realtime call signal channel already active, hook ${hookId.current} skipping`);
       return;
     }
 
     const supabase = getSupabase();
     const channelId = `call_signals:${couple.id}:${user.id}`;
     
-    console.log(`[useCall] Subscribing to realtime call signals for couple ${couple.id}`);
+    logger.debug(`[useCall] Subscribing to realtime call signals for couple ${couple.id}`);
     
     const channel = supabase
       .channel(channelId)
@@ -368,7 +369,7 @@ export function useCall() {
             }
           }
 
-          console.log('[useCall] Call signal received:', signal.type, 'id:', signal.id);
+          logger.debug('[useCall] Call signal received:', signal.type, 'id:', signal.id);
 
           if (signal.type === 'call-invite' && !useCallStore.getState().isInCall) {
             setIncomingCall(signal);
@@ -384,16 +385,16 @@ export function useCall() {
               clearTimeout(activeTimeout);
               activeTimeout = null;
             }
-            console.log('[useCall] Partner answered the call');
+            logger.debug('[useCall] Partner answered the call');
           } else if (signal.type === 'end' || signal.type === 'reject') {
-            console.log('[useCall] Call ended/rejected by remote');
+            logger.debug('[useCall] Call ended/rejected by remote');
             cleanup();
           }
         }
       );
 
     channel.subscribe((status) => {
-      console.log(`[useCall] Realtime call subscription status:`, status);
+      logger.debug(`[useCall] Realtime call subscription status:`, status);
     });
 
     activeChannel = channel;
@@ -401,7 +402,7 @@ export function useCall() {
 
     return () => {
       if (activeChannelCreatorHookId === hookId.current) {
-        console.log(`[useCall] Cleaning up realtime call channel`);
+        logger.debug(`[useCall] Cleaning up realtime call channel`);
         supabase.removeChannel(channel);
         activeChannel = null;
         activeChannelCreatorHookId = null;
