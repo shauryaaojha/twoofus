@@ -41,20 +41,20 @@ export async function POST(request: Request) {
       const payload = JSON.stringify({ title, body });
       await webpush.sendNotification(subData.subscription, payload);
       return NextResponse.json({ success: true });
-    } catch (pushErr: any) {
+    } catch (pushErr: unknown) {
       console.error('Failed to send push notification:', pushErr);
       
       // Clean up dead/expired subscriptions
-      if (pushErr.statusCode === 410 || pushErr.statusCode === 404) {
+      if (pushErr instanceof webpush.WebPushError && (pushErr.statusCode === 410 || pushErr.statusCode === 404)) {
         await supabase
           .from('push_subscriptions')
           .delete()
           .eq('user_id', userId);
       }
-      return NextResponse.json({ error: 'Push notification delivery failed', details: pushErr.message }, { status: 502 });
+      return NextResponse.json({ error: 'Push notification delivery failed', details: pushErr instanceof Error ? pushErr.message : String(pushErr) }, { status: 502 });
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Push send API error:', err);
-    return NextResponse.json({ error: 'Failed to trigger notification', details: err.message }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to trigger notification', details: err instanceof Error ? err.message : String(err) }, { status: 500 });
   }
 }
